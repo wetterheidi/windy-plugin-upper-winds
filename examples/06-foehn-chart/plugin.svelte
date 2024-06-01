@@ -9,26 +9,41 @@
         {title}
     </div>
 
-    <h2 class="mb-10">Foehn Chart</h2>
-    <p>In the Foehn chart, the pressure difference between Lugano and Zurich is represented.</p>
+    <h2 class="mb-10">Foehn Chart ICON</h2>
+    <p>In the Foehn chart, the pressure difference between Innsbruck and München is represented using ICON.</p>
     <Chart
-        pointTop={locations.Lugano}
-        pointBottom={locations.Zurich}
+        pointTop={locations.Innsbruck} 
+        pointBottom={locations.München}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <p>In the Foehn chart, the pressure difference between Innsbruck and München is represented using ICON-D2.</p>
+    <Chart
+        pointTop={locations.Innsbruck} 
+        pointBottom={locations.München}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <p>In the Foehn chart, the pressure difference between Innsbruck and München is represented using ECMWF.</p>
+    <Chart
+        pointTop={locations.Innsbruck} 
+        pointBottom={locations.München}
+        forecastModel={nwm.ECMWF}
         nameOfThisPlugin={name}
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
 
-    <hr />
-
-    <h2 class="mb-10">Bise Chart</h2>
-    <p>The Bise chart shows the pressure difference between Lake Constance and Lake Geneva.</p>
-    <Chart
-        pointTop={locations.LakeGeneva}
-        pointBottom={locations.LakeConstance}
-        nameOfThisPlugin={name}
-        bottomText="Bise ⬅"
-    />
 </section>
 
 <script lang="ts">
@@ -42,14 +57,20 @@
 
     const { title, name } = config;
 
-    type Location = 'Lugano' | 'Zurich' | 'LakeConstance' | 'LakeGeneva';
+    type Location = 'Innsbruck' | 'München';
 
     const locations: Record<Location, LatLon> = {
-        Lugano: { lat: 46.003678, lon: 8.951052 },
-        Zurich: { lat: 47.376887, lon: 8.541694 },
-        LakeConstance: { lat: 47.636583, lon: 9.389883 },
-        LakeGeneva: { lat: 46.447528, lon: 6.484511 },
-    };
+        Innsbruck: { lat: 47.260765, lon: 11.346860 },
+        München: { lat: 48.163363, lon: 11.543390 },
+        };
+
+    type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
+
+    const nwm: Record<Modell, string> = {
+        ECMWF: 'ecmwf',
+        ICON: 'icon',
+        ICOND2: 'iconD2',
+        };
 </script>
 
 <style lang="less">

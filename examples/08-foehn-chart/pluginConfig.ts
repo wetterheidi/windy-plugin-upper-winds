@@ -3,10 +3,10 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-foehn-chart',
     version: '1.0.1',
-    title: 'Foehn Chart Heidi',
+    title: 'Foehn and Bise Chart',
     icon: '⛰️',
-    description: 'Displays Foehn diagram for Austria.',
-    author: 'Heidi modified IL',
+    description: 'Displays Foehn and Bise diagram for Switzerland.',
+    author: 'IL (Windyty S.E.)',
     repository: 'https://github.com/windycom/windy-plugin-template',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',

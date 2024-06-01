@@ -14,7 +14,6 @@
     export let pointTop: LatLon;
     export let pointBottom: LatLon;
     export let nameOfThisPlugin: string;
-    export let forecastModel: string;
 
     export let topText: string | undefined = undefined;
     export let bottomText: string | undefined = undefined;
@@ -25,26 +24,8 @@
 
     $: {
         if (pointTop && pointBottom) {
-            const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
-
-            Promise.all([pointTopPromise, pointBottomPromise]).then(
-                ([{ data: top }, { data: bottom }]: HttpPayload<
-                    WeatherDataPayload<DataHash>
-                >[]) => {
-                    const topData = top.data;
-                    const bottomData = bottom.data;
-                    const tsValues = calculatePressureDifference(topData, bottomData);
-                    const midnights = getAllMidnights(top.summary);
-                    drawTheGraph(tsValues, midnights);
-                },
-            );
-        }
-    }    
-    $: {
-        if (pointTop && pointBottom) {
-            const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
+            const pointTopPromise = getPointForecastData('ecmwf', pointTop, nameOfThisPlugin);
+            const pointBottomPromise = getPointForecastData('ecmwf', pointBottom, nameOfThisPlugin);
 
             Promise.all([pointTopPromise, pointBottomPromise]).then(
                 ([{ data: top }, { data: bottom }]: HttpPayload<
@@ -59,25 +40,7 @@
             );
         }
     }
-    $: {
-        if (pointTop && pointBottom) {
-            const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
 
-            Promise.all([pointTopPromise, pointBottomPromise]).then(
-                ([{ data: top }, { data: bottom }]: HttpPayload<
-                    WeatherDataPayload<DataHash>
-                >[]) => {
-                    const topData = top.data;
-                    const bottomData = bottom.data;
-                    const tsValues = calculatePressureDifference(topData, bottomData);
-                    const midnights = getAllMidnights(top.summary);
-                    drawTheGraph(tsValues, midnights);
-                },
-            );
-        }
-    }
-    
     const getAllMidnights = (summary: Record<YearMonthDay, SummaryDay>): Timestamp[] => {
         return Object.keys(summary).map(key => summary[key].timestamp);
     };
@@ -199,7 +162,7 @@
             .append('path')
             .datum(lineData)
             .attr('fill', 'none')
-            .attr('stroke', 'yellow')
+            .attr('stroke', 'orange')
             .attr('stroke-width', 3)
             .attr('d', line);
 
