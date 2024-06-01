@@ -78,6 +78,11 @@
         }
     }
     
+   /* const getPointTop = (summary: Record<YearMonthDay, SummaryDay>): Timestamp[] => {
+        return pointTop;
+    };*/
+
+
     const getAllMidnights = (summary: Record<YearMonthDay, SummaryDay>): Timestamp[] => {
         return Object.keys(summary).map(key => summary[key].timestamp);
     };
