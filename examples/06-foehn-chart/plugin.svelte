@@ -10,21 +10,17 @@
     </div>
 
     <p>
-    <form name="SectionSelection">
+    
      <label>In the Foehn charts, the pressure difference between 
-        <select name="SectionSelection" id="section-names">
-            <option value="GZ">Genf - Zürich</option>
-            <option value="LZ">Lugano - Zürich</option>
-            <option value="ZS">Zürich - Stuttgart</option>
-            <option value="BI">Bozen - Innsbruck</option>
-            <option selected value="IM">Innsbruck - München</option>
-            <option value="KS">Klagenfurt - Salzburg</option>
-            <option value="GL">Graz - Linz</option>
+        <select bind:value={showCrossSection}>
+            {#each showCrossSectionAr as c}
+                <option value={c}>{c}</option>
+            {/each}
         </select>
-     is represented.
-     </label>
-    </form>
-        
+     is represented. 
+
+     <p>Ausgewählt: </p>
+     
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
         pointTop={locations.Innsbruck} 
@@ -68,6 +64,10 @@
 
     import type { LatLon } from '@windy/interfaces.d';
 
+    import store from '@windy/store';
+
+    let showCrossSection='';
+
     const { title, name } = config;
 
     type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz';
@@ -85,24 +85,50 @@
         Linz: { lat: 48.235696, lon: 14.190716 },
         Graz: { lat: 46.992977, lon: 15.441671 },
         };
+ 
+    const showCrossSectionAr = [
+        'Genf - Zürich',
+        'Lugano - Zürich',
+        'Zürich - Stuttgart',
+        'Bozen - Innsbruck',
+        'Innsbruck - München',
+        'Klagenfurt - Salzburg',
+        'Graz - Linz',
+        ];
 
-    type CrossSection = 'Genf - Zürich' | 'Lugano - Zürich'|'Zürich - Stuttgart' |'Bozen - Innsbruck' |'Innsbruck - München' |'Klagenfurt - Salzburg' |'Graz - Linz'; 
-
-    const sections: Record<CrossSection, string> = {
-        GZ: 'Genf - Zürich',
-        LZ: 'Lugano - Zürich',
-        ZS: 'Zürich - Stuttgart',
-        BI: 'Bozen - Innsbruck',
-        IM: 'Innsbruck - München',
-        KS: 'Klagenfurt - Salzburg',
-        GL: 'Graz - Linz',
-        };
-
-   /*if (i=0) {
-        pointTop = locations.Genf;
-        pointBottom = locations.Zürich;
-        } */
         
+//Was passiert hier?
+store.insert('windy-plugin-foehn-cross-section', {
+    def: showCrossSectionAr[0],
+    allowed: showCrossSectionAr,
+    save: true
+});
+
+showCrossSection = store.get('windy-plugin-foehn-cross-section');
+
+switch (showCrossSection) {
+        case 'Genf - Zürich':
+        alert('GZ');
+        break;
+        case 'Lugano - Zürich':
+            
+            break;
+        case 'Zürich - Stuttgart':
+            
+            break;
+        case 'Bozen - Innsbruck':
+            
+            break;
+        case 'Innsbruck - München':
+        alert('IM');
+            break;
+        case 'Klagenfurt - Salzburg':
+            
+            break;
+        case 'Graz - Linz':
+            
+            break;
+    }
 
     type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
 
@@ -111,6 +137,8 @@
         ICON: 'icon',
         ICOND2: 'iconD2',
         };
+
+    export { showCrossSectionAr };
 </script>
 
 <style lang="less">
