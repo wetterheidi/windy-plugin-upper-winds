@@ -180,7 +180,7 @@
                 .attr('y', textMargin)
                 .attr('text-anchor', 'end')
                 .attr('alignment-baseline', 'hanging')
-                .attr('font-size', '30px')
+                .attr('font-size', '25px')
                 .attr('opacity', 0.5)
                 .attr('fill', 'white')
                 .text(topText);
@@ -194,7 +194,7 @@
                 .attr('y', height - textMargin)
                 .attr('text-anchor', 'end')
                 .attr('alignment-baseline', 'ideographic')
-                .attr('font-size', '30px')
+                .attr('font-size', '25px')
                 .attr('opacity', 0.5)
                 .attr('fill', 'white')
                 .text(bottomText);

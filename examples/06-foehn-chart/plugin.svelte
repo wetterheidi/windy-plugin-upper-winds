@@ -13,14 +13,143 @@
     
      <label>In the Foehn charts, the pressure difference between 
         <select bind:value={showCrossSection}>
-            {#each showCrossSectionAr as c}
-                <option value={c}>{c}</option>
+            {#each showCrossSectionAr as selectedCrossSection}
+                <option value={selectedCrossSection}>{selectedCrossSection}</option>
             {/each}
         </select>
      is represented. 
 
-     <p>Ausgewählt: </p>
-     
+     <p>Check winds at 700 hPa (FL100/3000 m)!</p>
+
+    {#if showCrossSection == 'Genf - Zürich'}
+	<h2 class="mb-10">Foehn Chart ICON</h2>
+    <Chart
+        pointTop={locations.Genf} 
+        pointBottom={locations.Zürich}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="Westerly winds ⮕"
+        bottomText="Bise ⬅"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Genf} 
+        pointBottom={locations.Zürich}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="Westerly winds ⮕"
+        bottomText="Bise ⬅"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Genf} 
+        pointBottom={locations.Zürich}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="Westerly winds ⮕"
+        bottomText="Bise ⬅"
+    />
+    {:else if showCrossSection == 'Lugano - Zürich'}
+    <h2 class="mb-10">Foehn Chart ICON</h2>
+    <Chart
+        pointTop={locations.Lugano} 
+        pointBottom={locations.Zürich}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Lugano} 
+        pointBottom={locations.Zürich}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Lugano} 
+        pointBottom={locations.Zürich}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    {:else if showCrossSection == 'Zürich - Stuttgart'}
+    <h2 class="mb-10">Foehn Chart ICON</h2>
+    <Chart
+        pointTop={locations.Zürich} 
+        pointBottom={locations.Stuttgart}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Zürich} 
+        pointBottom={locations.Stuttgart}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Zürich} 
+        pointBottom={locations.Stuttgart}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    {:else if showCrossSection == 'Bozen - Innsbruck'}
+    <h2 class="mb-10">Foehn Chart ICON</h2>
+    <Chart
+        pointTop={locations.Bozen} 
+        pointBottom={locations.Innsbruck}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Bozen} 
+        pointBottom={locations.Innsbruck}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Bozen} 
+        pointBottom={locations.Innsbruck}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    {:else if showCrossSection == 'Innsbruck - München'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
         pointTop={locations.Innsbruck} 
@@ -52,10 +181,80 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    {:else if showCrossSection == 'Klagenfurt - Salzburg'}
+    <h2 class="mb-10">Foehn Chart ICON</h2>
+    <Chart
+        pointTop={locations.Klagenfurt} 
+        pointBottom={locations.Salzburg}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Klagenfurt} 
+        pointBottom={locations.Salzburg}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Klagenfurt} 
+        pointBottom={locations.Salzburg}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    {:else if showCrossSection == 'Graz - Linz'}
+    <h2 class="mb-10">Foehn Chart ICON</h2>
+    <Chart
+        pointTop={locations.Graz} 
+        pointBottom={locations.Linz}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Graz} 
+        pointBottom={locations.Linz}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Graz} 
+        pointBottom={locations.Linz}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="South foehn ⬆"
+        bottomText="North foehn ⬇"
+    />
+    {/if}
+     
+   
 
 </section>
 
+
+
 <script lang="ts">
+
     import bcast from '@windy/broadcast';
 
     import config from './pluginConfig';
@@ -66,9 +265,21 @@
 
     import store from '@windy/store';
 
-    let showCrossSection='';
+    import { map as windyMap } from "@windy/map";
+
+    import windyStore from "@windy/store";
+
+    import center from "@windy/location";
+
+    let showCrossSection = '';
 
     const { title, name } = config;
+
+    /* Set Map to Zoomlevel 8 and center at Innsbruck*/
+    windyMap.setView([47.260765, 11.346860], 8);
+    /* Show wind overlay */
+    windyStore.set("overlay", "wind");
+    /* Wind auf 700 hPa einstellen */
 
     type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz';
 
@@ -99,36 +310,13 @@
         
 //Was passiert hier?
 store.insert('windy-plugin-foehn-cross-section', {
-    def: showCrossSectionAr[0],
+    def: showCrossSectionAr[4],
     allowed: showCrossSectionAr,
     save: true
 });
 
 showCrossSection = store.get('windy-plugin-foehn-cross-section');
-
-switch (showCrossSection) {
-        case 'Genf - Zürich':
-        alert('GZ');
-        break;
-        case 'Lugano - Zürich':
-            
-            break;
-        case 'Zürich - Stuttgart':
-            
-            break;
-        case 'Bozen - Innsbruck':
-            
-            break;
-        case 'Innsbruck - München':
-        alert('IM');
-            break;
-        case 'Klagenfurt - Salzburg':
-            
-            break;
-        case 'Graz - Linz':
-            
-            break;
-    }
+export { showCrossSection };
 
     type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
 
@@ -139,6 +327,7 @@ switch (showCrossSection) {
         };
 
     export { showCrossSectionAr };
+
 </script>
 
 <style lang="less">

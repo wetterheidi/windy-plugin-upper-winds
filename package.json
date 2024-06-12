@@ -8,7 +8,6 @@
         "build": "rm -rf dist && mkdir dist && SERVE=false rollup -c && cp package.json dist/",
         "start": "rollup -w -c",
         "example06": "CONFIG=example06 rollup -w -c",
-        "example08": "CONFIG=example08 rollup -w -c",
         "build:all-examples": "for number in 01 02 03 04 05 06 07 08; do CONFIG=example$number SERVE=false rollup -c; done",
         "test": "echo \"Error: no test specified\" && exit 1"
     },

@@ -2,8 +2,8 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-foehn-chart',
-    version: '1.0.1',
-    title: 'Foehn Charts Heidi',
+    version: '0.9.1',
+    title: 'Foehn Charts Alps',
     icon: '⛰️',
     description: 'Displays Foehn diagrams for various cross sections.',
     author: 'Heidi modified IL',
