@@ -269,8 +269,6 @@
 
     import windyStore from "@windy/store";
 
-    import center from "@windy/location";
-
     let showCrossSection = '';
 
     const { title, name } = config;
