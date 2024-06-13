@@ -3,7 +3,7 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-foehn-chart',
     version: '0.9.1',
-    title: 'Foehn Charts Alps',
+    title: 'Pressure Difference Charts Alps',
     icon: '⛰️',
     description: 'Displays Foehn diagrams for various cross sections.',
     author: 'Heidi modified IL',
