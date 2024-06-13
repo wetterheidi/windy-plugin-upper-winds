@@ -11,7 +11,7 @@
 
     <p>
     
-     <label>In the Foehn charts, the pressure difference between 
+     <label>In these charts, the pressure difference between   
         <select bind:value={showCrossSection}>
             {#each showCrossSectionAr as selectedCrossSection}
                 <option value={selectedCrossSection}>{selectedCrossSection}</option>
@@ -19,10 +19,8 @@
         </select>
      is represented. 
 
-     <p>Check winds at 700 hPa (FL100/3000 m)!</p>
-
     {#if showCrossSection == 'Genf - Zürich'}
-	<h2 class="mb-10">Foehn Chart ICON</h2>
+	<h2 class="mb-10">Bise Chart ICON</h2>
     <Chart
         pointTop={locations.Genf} 
         pointBottom={locations.Zürich}
@@ -33,7 +31,7 @@
     />
     <hr />
 
-    <h2 class="mb-10">Foehn Chart ICON-D2</h2>
+    <h2 class="mb-10">Bise Chart ICON-D2</h2>
     <Chart
         pointTop={locations.Genf} 
         pointBottom={locations.Zürich}
@@ -44,7 +42,7 @@
     />
     <hr />
 
-    <h2 class="mb-10">Foehn Chart ECMWF</h2>
+    <h2 class="mb-10">Bise Chart ECMWF</h2>
     <Chart
         pointTop={locations.Genf} 
         pointBottom={locations.Zürich}
@@ -53,6 +51,7 @@
         topText="Westerly winds ⮕"
         bottomText="Bise ⬅"
     />
+    <p>Bise: Pressure difference of at least -4 hPa and northeasterly winds at 700 hPa</p>
     {:else if showCrossSection == 'Lugano - Zürich'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
@@ -85,6 +84,7 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
     {:else if showCrossSection == 'Zürich - Stuttgart'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
@@ -117,6 +117,7 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
     {:else if showCrossSection == 'Bozen - Innsbruck'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
@@ -149,6 +150,7 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
     {:else if showCrossSection == 'Innsbruck - München'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
@@ -181,6 +183,7 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
     {:else if showCrossSection == 'Klagenfurt - Salzburg'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
@@ -213,6 +216,7 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
     {:else if showCrossSection == 'Graz - Linz'}
     <h2 class="mb-10">Foehn Chart ICON</h2>
     <Chart
@@ -245,8 +249,44 @@
         topText="South foehn ⬆"
         bottomText="North foehn ⬇"
     />
+    <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
+    {:else if showCrossSection == 'Brescia - Bozen'}
+    <h2 class="mb-10">Ora Chart ICON</h2>
+    <Chart
+        pointTop={locations.Brescia} 
+        pointBottom={locations.Bozen}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        topText="Ora ⬆"
+        bottomText="Peler ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Ora Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Brescia} 
+        pointBottom={locations.Bozen}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        topText="Ora ⬆"
+        bottomText="Peler ⬇"
+    />
+    <hr />
+
+    <h2 class="mb-10">Ora Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Brescia} 
+        pointBottom={locations.Bozen}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        topText="Ora ⬆"
+        bottomText="Peler ⬇"
+    />
+    <p>Ora/Peler: Stronger pressure differences refer to stronger winds</p>
     {/if}
      
+   
+    
    
 
 </section>
@@ -279,7 +319,7 @@
     windyStore.set("overlay", "wind");
     /* Wind auf 700 hPa einstellen */
 
-    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz';
+    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia';
 
     const locations: Record<Location, LatLon> = {
         Innsbruck: { lat: 47.260765, lon: 11.346860 },
@@ -293,6 +333,7 @@
         Klagenfurt: { lat: 46.646212, lon: 14.322369 },
         Linz: { lat: 48.235696, lon: 14.190716 },
         Graz: { lat: 46.992977, lon: 15.441671 },
+        Brescia: { lat: 45.436234, lon: 10.268309 },
         };
  
     const showCrossSectionAr = [
@@ -303,6 +344,7 @@
         'Innsbruck - München',
         'Klagenfurt - Salzburg',
         'Graz - Linz',
+        'Brescia - Bozen',
         ];
 
         
