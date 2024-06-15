@@ -17,7 +17,7 @@
                 <option value={selectedCrossSection}>{selectedCrossSection}</option>
             {/each}
         </select>
-     is represented. 
+     is represented. {showCrossSection}
 
     {#if showCrossSection == 'Genf - Zürich'}
 	<h2 class="mb-10">Bise Chart ICON</h2>
@@ -284,11 +284,7 @@
     />
     <p>Ora/Peler: Stronger pressure differences refer to stronger winds</p>
     {/if}
-     
-   
-    
-   
-
+ 
 </section>
 
 
@@ -309,16 +305,61 @@
 
     import windyStore from "@windy/store";
 
-    let showCrossSection = '';
+    import { emitter as picker } from "@windy/picker";
+
+    let showCrossSection ='';
 
     const { title, name } = config;
 
-    /* Set Map to Zoomlevel 8 and center at Innsbruck*/
-    windyMap.setView([47.260765, 11.346860], 8);
-    /* Show wind overlay */
-    windyStore.set("overlay", "wind");
-    /* Wind auf 700 hPa einstellen */
+    const showCrossSectionAr = [
+        'Genf - Zürich',
+        'Lugano - Zürich',
+        'Zürich - Stuttgart',
+        'Bozen - Innsbruck',
+        'Innsbruck - München',
+        'Klagenfurt - Salzburg',
+        'Graz - Linz',
+        'Brescia - Bozen',
+        ];
 
+    //Was passiert hier?
+    store.insert('windy-plugin-foehn-cross-section', {
+       def: showCrossSectionAr[4],
+       allowed: showCrossSectionAr,
+       save: true
+    });
+
+    showCrossSection = store.get('windy-plugin-foehn-cross-section');
+    export { showCrossSection };
+
+
+    /* Set Map to Zoomlevel 8 and center at Innsbruck*/
+    //windyMap.setView([47.260765, 11.346860], 8);
+    /* Show wind overlay at 700 hPa*/
+    windyStore.set("overlay", "wind");
+    windyStore.set("level", "700h");
+    
+    /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
+    if (showCrossSection == 'Genf - Zürich'){
+        windyMap.setView([46.707778, 7.308056], 8);
+    } else if (showCrossSection == 'Lugano - Zürich') {
+        windyMap.setView([46.674444, 8.747222], 8);
+    } else if (showCrossSection == 'Zürich - Stuttgart') {
+        windyMap.setView([48.108333, 8.870278], 8);
+    } else if (showCrossSection == 'Bozen - Innsbruck') {
+        windyMap.setView([46.891389, 11.364167], 8);
+    } else if (showCrossSection == 'Innsbruck - München') {
+        windyMap.setView([47.751389, 11.473889], 8);
+    } else if (showCrossSection == 'Klagenfurt - Salzburg') {
+        windyMap.setView([47.245833, 13.624722], 8);
+    } else if (showCrossSection == 'Graz - Linz') {
+        windyMap.setView([47.695, 14.855], 8);
+    } else if (showCrossSection == 'Brescia - Bozen') {
+        windyMap.setView([45.861944, 10.870833], 8);
+    } else if (showCrossSection == '') {
+        windyMap.setView([55, 20], 8);
+    }  
+    
     type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia';
 
     const locations: Record<Location, LatLon> = {
@@ -336,27 +377,10 @@
         Brescia: { lat: 45.436234, lon: 10.268309 },
         };
  
-    const showCrossSectionAr = [
-        'Genf - Zürich',
-        'Lugano - Zürich',
-        'Zürich - Stuttgart',
-        'Bozen - Innsbruck',
-        'Innsbruck - München',
-        'Klagenfurt - Salzburg',
-        'Graz - Linz',
-        'Brescia - Bozen',
-        ];
+    
 
         
-//Was passiert hier?
-store.insert('windy-plugin-foehn-cross-section', {
-    def: showCrossSectionAr[4],
-    allowed: showCrossSectionAr,
-    save: true
-});
 
-showCrossSection = store.get('windy-plugin-foehn-cross-section');
-export { showCrossSection };
 
     type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
 
