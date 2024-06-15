@@ -17,7 +17,7 @@
                 <option value={selectedCrossSection}>{selectedCrossSection}</option>
             {/each}
         </select>
-     is represented. {showCrossSection}
+     is represented. 
 
     {#if showCrossSection == 'Genf - Zürich'}
 	<h2 class="mb-10">Bise Chart ICON</h2>
@@ -252,6 +252,7 @@
     <p>Foehn: Pressure difference of at least +/-4 hPa and southerly/northerly winds of at least 20 kt at 700 hPa</p>
     {:else if showCrossSection == 'Brescia - Bozen'}
     <h2 class="mb-10">Ora Chart ICON</h2>
+
     <Chart
         pointTop={locations.Brescia} 
         pointBottom={locations.Bozen}
@@ -330,8 +331,6 @@
     });
 
     showCrossSection = store.get('windy-plugin-foehn-cross-section');
-    export { showCrossSection };
-
 
     /* Set Map to Zoomlevel 8 and center at Innsbruck*/
     //windyMap.setView([47.260765, 11.346860], 8);
@@ -339,6 +338,37 @@
     windyStore.set("overlay", "wind");
     windyStore.set("level", "700h");
     
+    centerMap();
+    
+    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia';
+
+    const locations: Record<Location, LatLon> = {
+        Innsbruck: { lat: 47.260765, lon: 11.346860 },
+        München: { lat: 48.163363, lon: 11.543390 },
+        Zürich: { lat: 47.457340, lon: 8.554624 },
+        Lugano: { lat: 46.003140, lon: 8.909517 },
+        Genf: { lat: 46.241142, lon: 6.116257 },
+        Stuttgart: { lat: 48.686346, lon: 9.203620 },
+        Bozen: { lat: 46.460921, lon: 11.326727 },
+        Salzburg: { lat: 47.792859, lon: 13.003159 },
+        Klagenfurt: { lat: 46.646212, lon: 14.322369 },
+        Linz: { lat: 48.235696, lon: 14.190716 },
+        Graz: { lat: 46.992977, lon: 15.441671 },
+        Brescia: { lat: 45.436234, lon: 10.268309 },
+        };
+ 
+    type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
+
+    const nwm: Record<Modell, string> = {
+        ECMWF: 'ecmwf',
+        ICON: 'icon',
+        ICOND2: 'iconD2',
+        };
+
+    export { showCrossSectionAr };
+    export { showCrossSection };
+
+    function centerMap(){
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
     if (showCrossSection == 'Genf - Zürich'){
         windyMap.setView([46.707778, 7.308056], 8);
@@ -359,38 +389,14 @@
     } else if (showCrossSection == '') {
         windyMap.setView([55, 20], 8);
     }  
-    
-    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia';
+    }
 
-    const locations: Record<Location, LatLon> = {
-        Innsbruck: { lat: 47.260765, lon: 11.346860 },
-        München: { lat: 48.163363, lon: 11.543390 },
-        Zürich: { lat: 47.457340, lon: 8.554624 },
-        Lugano: { lat: 46.003140, lon: 8.909517 },
-        Genf: { lat: 46.241142, lon: 6.116257 },
-        Stuttgart: { lat: 48.686346, lon: 9.203620 },
-        Bozen: { lat: 46.460921, lon: 11.326727 },
-        Salzburg: { lat: 47.792859, lon: 13.003159 },
-        Klagenfurt: { lat: 46.646212, lon: 14.322369 },
-        Linz: { lat: 48.235696, lon: 14.190716 },
-        Graz: { lat: 46.992977, lon: 15.441671 },
-        Brescia: { lat: 45.436234, lon: 10.268309 },
-        };
- 
-    
-
-        
-
-
-    type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
-
-    const nwm: Record<Modell, string> = {
-        ECMWF: 'ecmwf',
-        ICON: 'icon',
-        ICOND2: 'iconD2',
-        };
-
-    export { showCrossSectionAr };
+    $: {
+        //showCrossSection = 'Genf - Zürich';
+        //windyMap.setView([46.707778, 7.308056], 8);
+        centerMap();
+        //switchCoordsDiv(showCoords);
+    }
 
 </script>
 

@@ -1,0 +1,15 @@
+{
+  "entryFilePath": "dist/plugin.min.js",
+  "alias": {
+    "@windy/*": "node_modules/@windycom/plugin-devtools/types/*"
+  },
+  "resolveExtensions": [
+    ".js",
+    ".jsx",
+    ".ts",
+    ".tsx",
+    ".vue",
+    ".scss",
+    ".less"
+  ]
+}
