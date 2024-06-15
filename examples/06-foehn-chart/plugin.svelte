@@ -12,10 +12,11 @@
     <p>
     
      <label>In these charts, the pressure difference between   
-        <select bind:value={showCrossSection}>
+        <select bind:value={showCrossSection} id="CS">
             {#each showCrossSectionAr as selectedCrossSection}
                 <option value={selectedCrossSection}>{selectedCrossSection}</option>
             {/each}
+            
         </select>
      is represented. 
 
@@ -293,20 +294,17 @@
 <script lang="ts">
 
     import bcast from '@windy/broadcast';
-
+    import { getLatLonInterpolator } from '@windy/interpolator';
     import config from './pluginConfig';
-
+    import { wind2obj } from '@windy/utils';
     import Chart from './Chart.svelte';
-
+    import metrics from '@windy/metrics';
     import type { LatLon } from '@windy/interfaces.d';
-
     import store from '@windy/store';
-
     import { map as windyMap } from "@windy/map";
-
     import windyStore from "@windy/store";
-
-    import { emitter as picker } from "@windy/picker";
+    
+    import type { CoordsInterpolationFun } from '@windy/interpolator';
 
     let showCrossSection ='';
 
@@ -338,8 +336,6 @@
     windyStore.set("overlay", "wind");
     windyStore.set("level", "700h");
     
-    centerMap();
-    
     type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia';
 
     const locations: Record<Location, LatLon> = {
@@ -368,10 +364,11 @@
     export { showCrossSectionAr };
     export { showCrossSection };
 
-    function centerMap(){
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
-    if (showCrossSection == 'Genf - Zürich'){
+    $: {
+        if (showCrossSection == 'Genf - Zürich'){
         windyMap.setView([46.707778, 7.308056], 8);
+        windValues(46.707778, 7.308056);
     } else if (showCrossSection == 'Lugano - Zürich') {
         windyMap.setView([46.674444, 8.747222], 8);
     } else if (showCrossSection == 'Zürich - Stuttgart') {
@@ -390,14 +387,12 @@
         windyMap.setView([55, 20], 8);
     }  
     }
-
-    $: {
-        //showCrossSection = 'Genf - Zürich';
-        //windyMap.setView([46.707778, 7.308056], 8);
-        centerMap();
-        //switchCoordsDiv(showCoords);
+        
+    function windValues (latitude,longitude){
+      alert("Drin " + latitude + ' ' + longitude);
+      
     }
-
+   
 </script>
 
 <style lang="less">
