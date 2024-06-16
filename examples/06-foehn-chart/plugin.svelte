@@ -284,7 +284,37 @@
         topText="Ora ⬆"
         bottomText="Peler ⬇"
     />
-    <p>Ora/Peler: Stronger pressure differences refer to stronger winds</p>
+    {:else if showCrossSection == 'Maribor - Triest'}
+    <h2 class="mb-10">Bora Chart ICON</h2>
+
+    <Chart
+        pointTop={locations.Maribor} 
+        pointBottom={locations.Triest}
+        forecastModel={nwm.ICON}
+        nameOfThisPlugin={name}
+        bottomText="Bora ⬅"
+    />
+    <hr />
+
+    <h2 class="mb-10">Bora Chart ICON-D2</h2>
+    <Chart
+        pointTop={locations.Maribor} 
+        pointBottom={locations.Triest}
+        forecastModel={nwm.ICOND2}
+        nameOfThisPlugin={name}
+        bottomText="Bora ⬅"
+    />
+    <hr />
+
+    <h2 class="mb-10">Bora Chart ECMWF</h2>
+    <Chart
+        pointTop={locations.Maribor} 
+        pointBottom={locations.Triest}
+        forecastModel={nwm.ECMWF}
+        nameOfThisPlugin={name}
+        bottomText="Bora ⬅"
+    />
+    <p>Bora: pressure differences of -4 hPa, Stormy Bora: pressure difference of -8 hPa</p>
     {/if}
  
 </section>
@@ -300,6 +330,7 @@
     import store from '@windy/store';
     import { map as windyMap } from "@windy/map";
     import windyStore from "@windy/store";
+    import { onDestroy } from 'svelte';
    
     let showCrossSection ='';
 
@@ -314,6 +345,7 @@
         'Klagenfurt - Salzburg',
         'Graz - Linz',
         'Brescia - Bozen',
+        'Maribor - Triest',
         ];
 
     //Was passiert hier?
@@ -329,7 +361,7 @@
     windyStore.set("overlay", "wind");
     windyStore.set("level", "700h");
     
-    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia' | 'middleOfGenfZürich' | 'middleOfLuganoZürich' | 'middleOfZürichStuttgart' | 'middleOfBozenInnsbruck' | 'middleOfInnsbruckMünchen' | 'middleOfKlagenfurtSalzburg' | 'middleOfGrazLinz' | 'middleOfBresciaBozen';
+    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia' | 'Maribor' | 'Triest' | 'middleOfMariborTriest' | 'middleOfGenfZürich' | 'middleOfLuganoZürich' | 'middleOfZürichStuttgart' | 'middleOfBozenInnsbruck' | 'middleOfInnsbruckMünchen' | 'middleOfKlagenfurtSalzburg' | 'middleOfGrazLinz' | 'middleOfBresciaBozen';
 
     const locations: Record<Location, LatLon> = {
         Innsbruck: { lat: 47.260765, lon: 11.346860 },
@@ -344,6 +376,8 @@
         Linz: { lat: 48.235696, lon: 14.190716 },
         Graz: { lat: 46.992977, lon: 15.441671 },
         Brescia: { lat: 45.436234, lon: 10.268309 },
+        Maribor: { lat: 46.479444, lon: 15.684444 },
+        Triest: { lat: 45.635833, lon: 13.835 },
         middleOfGenfZürich: { lat: 46.773611, lon: 7.175278 },
         middleOfLuganoZürich: { lat: 46.674444, lon: 8.747222 },
         middleOfZürichStuttgart: { lat: 48.104444, lon: 8.893611 },
@@ -352,6 +386,7 @@
         middleOfKlagenfurtSalzburg: { lat: 47.245833, lon: 13.624722 },
         middleOfGrazLinz: { lat: 47.665278, lon: 14.771111 },
         middleOfBresciaBozen: { lat: 45.937222, lon: 10.782778 },
+        middleOfMariborTriest: { lat: 46.051944, lon: 14.744167 },
         };
  
     type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
@@ -414,19 +449,21 @@
         drawLine(locations.Brescia.lat, locations.Brescia.lon, locations.Bozen.lat, locations.Bozen.lon);
         popupInfo(locations.middleOfBresciaBozen.lat, locations.middleOfBresciaBozen.lon);
         windyMap.setView([locations.middleOfBresciaBozen.lat, locations.middleOfBresciaBozen.lon], 8);
+    
+    } else if (showCrossSection == 'Maribor - Triest') {
+        
+        drawLine(locations.Maribor.lat, locations.Maribor.lon, locations.Triest.lat, locations.Triest.lon);
+        popupInfo(locations.middleOfMariborTriest.lat, locations.middleOfMariborTriest.lon);
+        windyMap.setView([locations.middleOfMariborTriest.lat, locations.middleOfMariborTriest.lon], 8);
 
     } else if (showCrossSection == '') {
         alert("No cross section is selected!")
     }  
     }
-        
-    function windValues (latitude: number,longitude: number){
-      //alert("Drin " + latitude + ' ' + longitude);
-      /* Place picker to location*/
-    }
 
     /* Add layer for lines to the map*/
     var activeLine = L.featureGroup().addTo(windyMap);
+    let openedPopup: L.Popup | null = null;
 
     function drawLine (startLatitude: number, startLongitude: number, endLatitude: number, endLongitude: number){
         /*Delete existing line*/
@@ -440,13 +477,17 @@
 
     function popupInfo (middleLatitude: number, middleLongitude: number) {
         /*Place Popup Marker in the middle of the cross section*/
-        L.popup()
+        openedPopup =  new L.Popup()
             .setLatLng([ middleLatitude, middleLongitude ])
             .setContent(showCrossSection)
             .openOn( windyMap );
     }
    
-   
+    onDestroy(() => {
+        openedPopup?.remove();
+        windyMap.removeLayer;
+        activeLine._removeAllTiles;
+        });
 </script>
 
 <style lang="less">
