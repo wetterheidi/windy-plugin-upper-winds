@@ -15,7 +15,6 @@
     export let pointBottom: LatLon;
     export let nameOfThisPlugin: string;
     export let forecastModel: string;
-    export let sectionNames: string;
 
     export let topText: string | undefined = undefined;
     export let bottomText: string | undefined = undefined;

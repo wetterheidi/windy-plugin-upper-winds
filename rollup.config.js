@@ -24,10 +24,6 @@ const buildConfigurations = {
         input: 'examples/06-foehn-chart/plugin.svelte',
         out: 'example06/plugin',
     },
-    example08: {
-        input: 'examples/08-foehn-chart/plugin.svelte',
-        out: 'example08/plugin',
-    },
 };
 
 const requiredConfig = process.env.CONFIG || 'src';

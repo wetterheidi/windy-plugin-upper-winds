@@ -368,50 +368,59 @@
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
     $: {
         if (showCrossSection == 'Genf - Zürich'){
+
         drawLine(locations.Genf.lat, locations.Genf.lon, locations.Zürich.lat, locations.Zürich.lon);
         popupInfo(locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon);
         windyMap.setView([locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon], 8);
+
     } else if (showCrossSection == 'Lugano - Zürich') {
         
         drawLine(locations.Lugano.lat, locations.Lugano.lon, locations.Zürich.lat, locations.Zürich.lon);
         popupInfo(locations.middleOfLuganoZürich.lat, locations.middleOfLuganoZürich.lon);
         windyMap.setView([locations.middleOfLuganoZürich.lat, locations.middleOfLuganoZürich.lon], 8);
+
     } else if (showCrossSection == 'Zürich - Stuttgart') {
         
         drawLine(locations.Zürich.lat, locations.Zürich.lon, locations.Stuttgart.lat, locations.Stuttgart.lon);
         popupInfo(locations.middleOfZürichStuttgart.lat, locations.middleOfZürichStuttgart.lon);
         windyMap.setView([locations.middleOfZürichStuttgart.lat, locations.middleOfZürichStuttgart.lon], 8);
+
     } else if (showCrossSection == 'Bozen - Innsbruck') {
        
         drawLine(locations.Bozen.lat, locations.Bozen.lon, locations.Innsbruck.lat, locations.Innsbruck.lon);
         popupInfo(locations.middleOfBozenInnsbruck.lat, locations.middleOfBozenInnsbruck.lon);
         windyMap.setView([locations.middleOfBozenInnsbruck.lat, locations.middleOfBozenInnsbruck.lon], 8);
+
     } else if (showCrossSection == 'Innsbruck - München') {
         
         drawLine(locations.Innsbruck.lat, locations.Innsbruck.lon, locations.München.lat, locations.München.lon);
         popupInfo(locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon);
         windyMap.setView([locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon], 8);
+
     } else if (showCrossSection == 'Klagenfurt - Salzburg') {
         
         drawLine(locations.Klagenfurt.lat, locations.Klagenfurt.lon, locations.Salzburg.lat, locations.Salzburg.lon);
         popupInfo(locations.middleOfKlagenfurtSalzburg.lat, locations.middleOfKlagenfurtSalzburg.lon);
         windyMap.setView([locations.middleOfKlagenfurtSalzburg.lat, locations.middleOfKlagenfurtSalzburg.lon], 8);
+
     } else if (showCrossSection == 'Graz - Linz') {
         
         drawLine(locations.Graz.lat, locations.Graz.lon, locations.Linz.lat, locations.Linz.lon);
         popupInfo(locations.middleOfGrazLinz.lat, locations.middleOfGrazLinz.lon);
         windyMap.setView([locations.middleOfGrazLinz.lat, locations.middleOfGrazLinz.lon], 8);
+
     } else if (showCrossSection == 'Brescia - Bozen') {
         
         drawLine(locations.Brescia.lat, locations.Brescia.lon, locations.Bozen.lat, locations.Bozen.lon);
         popupInfo(locations.middleOfBresciaBozen.lat, locations.middleOfBresciaBozen.lon);
         windyMap.setView([locations.middleOfBresciaBozen.lat, locations.middleOfBresciaBozen.lon], 8);
+
     } else if (showCrossSection == '') {
         alert("No cross section is selected!")
     }  
     }
         
-    function windValues (latitude,longitude){
+    function windValues (latitude: number,longitude: number){
       //alert("Drin " + latitude + ' ' + longitude);
       /* Place picker to location*/
     }
