@@ -294,18 +294,13 @@
 <script lang="ts">
 
     import bcast from '@windy/broadcast';
-    import { getLatLonInterpolator } from '@windy/interpolator';
     import config from './pluginConfig';
-    import { wind2obj } from '@windy/utils';
     import Chart from './Chart.svelte';
-    import metrics from '@windy/metrics';
     import type { LatLon } from '@windy/interfaces.d';
     import store from '@windy/store';
     import { map as windyMap } from "@windy/map";
     import windyStore from "@windy/store";
-    
-    import type { CoordsInterpolationFun } from '@windy/interpolator';
-
+   
     let showCrossSection ='';
 
     const { title, name } = config;
@@ -330,13 +325,11 @@
 
     showCrossSection = store.get('windy-plugin-foehn-cross-section');
 
-    /* Set Map to Zoomlevel 8 and center at Innsbruck*/
-    //windyMap.setView([47.260765, 11.346860], 8);
     /* Show wind overlay at 700 hPa*/
     windyStore.set("overlay", "wind");
     windyStore.set("level", "700h");
     
-    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia';
+    type Location = 'Innsbruck' | 'München' | 'Zürich'| 'Lugano'| 'Genf'| 'Stuttgart'| 'Bozen'| 'Salzburg'| 'Klagenfurt'| 'Linz'| 'Graz' | 'Brescia' | 'middleOfGenfZürich' | 'middleOfLuganoZürich' | 'middleOfZürichStuttgart' | 'middleOfBozenInnsbruck' | 'middleOfInnsbruckMünchen' | 'middleOfKlagenfurtSalzburg' | 'middleOfGrazLinz' | 'middleOfBresciaBozen';
 
     const locations: Record<Location, LatLon> = {
         Innsbruck: { lat: 47.260765, lon: 11.346860 },
@@ -351,6 +344,14 @@
         Linz: { lat: 48.235696, lon: 14.190716 },
         Graz: { lat: 46.992977, lon: 15.441671 },
         Brescia: { lat: 45.436234, lon: 10.268309 },
+        middleOfGenfZürich: { lat: 46.773611, lon: 7.175278 },
+        middleOfLuganoZürich: { lat: 46.674444, lon: 8.747222 },
+        middleOfZürichStuttgart: { lat: 48.104444, lon: 8.893611 },
+        middleOfBozenInnsbruck: { lat: 46.885833, lon: 11.336667 },
+        middleOfInnsbruckMünchen: { lat: 47.751944, lon: 11.453889 },
+        middleOfKlagenfurtSalzburg: { lat: 47.245833, lon: 13.624722 },
+        middleOfGrazLinz: { lat: 47.665278, lon: 14.771111 },
+        middleOfBresciaBozen: { lat: 45.937222, lon: 10.782778 },
         };
  
     type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
@@ -367,31 +368,75 @@
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
     $: {
         if (showCrossSection == 'Genf - Zürich'){
-        windyMap.setView([46.707778, 7.308056], 8);
-        windValues(46.707778, 7.308056);
+        drawLine(locations.Genf.lat, locations.Genf.lon, locations.Zürich.lat, locations.Zürich.lon);
+        popupInfo(locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon);
+        windyMap.setView([locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon], 8);
     } else if (showCrossSection == 'Lugano - Zürich') {
-        windyMap.setView([46.674444, 8.747222], 8);
+        
+        drawLine(locations.Lugano.lat, locations.Lugano.lon, locations.Zürich.lat, locations.Zürich.lon);
+        popupInfo(locations.middleOfLuganoZürich.lat, locations.middleOfLuganoZürich.lon);
+        windyMap.setView([locations.middleOfLuganoZürich.lat, locations.middleOfLuganoZürich.lon], 8);
     } else if (showCrossSection == 'Zürich - Stuttgart') {
-        windyMap.setView([48.108333, 8.870278], 8);
+        
+        drawLine(locations.Zürich.lat, locations.Zürich.lon, locations.Stuttgart.lat, locations.Stuttgart.lon);
+        popupInfo(locations.middleOfZürichStuttgart.lat, locations.middleOfZürichStuttgart.lon);
+        windyMap.setView([locations.middleOfZürichStuttgart.lat, locations.middleOfZürichStuttgart.lon], 8);
     } else if (showCrossSection == 'Bozen - Innsbruck') {
-        windyMap.setView([46.891389, 11.364167], 8);
+       
+        drawLine(locations.Bozen.lat, locations.Bozen.lon, locations.Innsbruck.lat, locations.Innsbruck.lon);
+        popupInfo(locations.middleOfBozenInnsbruck.lat, locations.middleOfBozenInnsbruck.lon);
+        windyMap.setView([locations.middleOfBozenInnsbruck.lat, locations.middleOfBozenInnsbruck.lon], 8);
     } else if (showCrossSection == 'Innsbruck - München') {
-        windyMap.setView([47.751389, 11.473889], 8);
+        
+        drawLine(locations.Innsbruck.lat, locations.Innsbruck.lon, locations.München.lat, locations.München.lon);
+        popupInfo(locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon);
+        windyMap.setView([locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon], 8);
     } else if (showCrossSection == 'Klagenfurt - Salzburg') {
-        windyMap.setView([47.245833, 13.624722], 8);
+        
+        drawLine(locations.Klagenfurt.lat, locations.Klagenfurt.lon, locations.Salzburg.lat, locations.Salzburg.lon);
+        popupInfo(locations.middleOfKlagenfurtSalzburg.lat, locations.middleOfKlagenfurtSalzburg.lon);
+        windyMap.setView([locations.middleOfKlagenfurtSalzburg.lat, locations.middleOfKlagenfurtSalzburg.lon], 8);
     } else if (showCrossSection == 'Graz - Linz') {
-        windyMap.setView([47.695, 14.855], 8);
+        
+        drawLine(locations.Graz.lat, locations.Graz.lon, locations.Linz.lat, locations.Linz.lon);
+        popupInfo(locations.middleOfGrazLinz.lat, locations.middleOfGrazLinz.lon);
+        windyMap.setView([locations.middleOfGrazLinz.lat, locations.middleOfGrazLinz.lon], 8);
     } else if (showCrossSection == 'Brescia - Bozen') {
-        windyMap.setView([45.861944, 10.870833], 8);
+        
+        drawLine(locations.Brescia.lat, locations.Brescia.lon, locations.Bozen.lat, locations.Bozen.lon);
+        popupInfo(locations.middleOfBresciaBozen.lat, locations.middleOfBresciaBozen.lon);
+        windyMap.setView([locations.middleOfBresciaBozen.lat, locations.middleOfBresciaBozen.lon], 8);
     } else if (showCrossSection == '') {
-        windyMap.setView([55, 20], 8);
+        alert("No cross section is selected!")
     }  
     }
         
     function windValues (latitude,longitude){
-      alert("Drin " + latitude + ' ' + longitude);
-      
+      //alert("Drin " + latitude + ' ' + longitude);
+      /* Place picker to location*/
     }
+
+    /* Add layer for lines to the map*/
+    var activeLine = L.featureGroup().addTo(windyMap);
+
+    function drawLine (startLatitude: number, startLongitude: number, endLatitude: number, endLongitude: number){
+        /*Delete existing line*/
+        activeLine.clearLayers();
+        /* Draw line between start and end location */
+        var line = L.polyline([
+            [startLatitude, startLongitude],
+            [endLatitude, endLongitude]
+            ], {color: 'red'}).addTo(activeLine);
+    }
+
+    function popupInfo (middleLatitude: number, middleLongitude: number) {
+        /*Place Popup Marker in the middle of the cross section*/
+        L.popup()
+            .setLatLng([ middleLatitude, middleLongitude ])
+            .setContent(showCrossSection)
+            .openOn( windyMap );
+    }
+   
    
 </script>
 
