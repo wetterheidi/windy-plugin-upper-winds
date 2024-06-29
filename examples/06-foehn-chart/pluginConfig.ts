@@ -1,7 +1,7 @@
 import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
-    name: 'windy-plugin-foehn-chart',
+    name: 'windy-plugin-foehn-cross-section',
     version: '0.9.1',
     title: 'Pressure Difference Charts Alps',
     icon: '⛰️',
