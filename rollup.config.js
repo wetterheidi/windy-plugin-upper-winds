@@ -19,11 +19,7 @@ const buildConfigurations = {
     src: {
         input: 'src/plugin.svelte',
         out: 'plugin',
-    },
-    example06: {
-        input: 'examples/06-foehn-chart/plugin.svelte',
-        out: 'example06/plugin',
-    },
+    }
 };
 
 const requiredConfig = process.env.CONFIG || 'src';
