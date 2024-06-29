@@ -331,7 +331,12 @@
     import { map as windyMap } from "@windy/map";
     import windyStore from "@windy/store";
     import { onDestroy } from 'svelte';
-   
+    //Imports für Interpolation von Werten
+    import { getLatLonInterpolator } from '@windy/interpolator';
+    import type { CoordsInterpolationFun } from '@windy/interpolator';
+    import { wind2obj } from '@windy/utils';
+    import metrics from '@windy/metrics';
+
     let showCrossSection ='';
 
     const { title, name } = config;
@@ -427,7 +432,7 @@
         windyMap.setView([locations.middleOfBozenInnsbruck.lat, locations.middleOfBozenInnsbruck.lon], 8);
 
     } else if (showCrossSection == 'Innsbruck - München') {
-        
+      
         drawLine(locations.Innsbruck.lat, locations.Innsbruck.lon, locations.München.lat, locations.München.lon);
         popupInfo(locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon);
         windyMap.setView([locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon], 8);
@@ -476,13 +481,44 @@
     }
 
     function popupInfo (middleLatitude: number, middleLongitude: number) {
-        /*Place Popup Marker in the middle of the cross section*/
-        openedPopup =  new L.Popup()
-            .setLatLng([ middleLatitude, middleLongitude ])
-            .setContent(showCrossSection)
-            .openOn( windyMap );
-    }
-   
+        /* Interpolate wind values for the selected cross section*/
+        getLatLonInterpolator().then((interpolateLatLon: CoordsInterpolationFun | null) => {
+            let html = `${showCrossSection}<br />`;
+            const [lat, lon] = [middleLatitude, middleLongitude];
+            
+            if (!interpolateLatLon) {
+                    html += 'No interpolator available<br />for this overlay';
+                } else if (store.get('overlay') !== 'wind') {
+                    html +=
+                        'For sake of the simplicity, we<br />interpolate only wind values.<br />Please select wind overlay.';
+                } else {
+                    // Interpolated values can be either invalid (NaN, null, -1)
+                    // or array of numbers
+                    const interpolated = interpolateLatLon({ lat, lon });
+
+                    if (Array.isArray(interpolated)) {
+                        // I everything works well, we should get raw meterological values
+
+                        const { dir, wind } = wind2obj(interpolated);
+
+                        // This will convert wind speed form m/s to user's preferred units
+                        const windSpeed = metrics.wind.convertValue(wind);
+
+                        html += `Wind: ${dir}° ${windSpeed}<br />`;
+                        
+                    } else {
+                        html += 'No interpolated values available for this position';
+                    }
+                }
+
+                /*Place Popup Marker in the middle of the cross section*/
+                openedPopup =  new L.Popup()
+                    .setLatLng([ middleLatitude, middleLongitude ])
+                    .setContent(html)
+                    .openOn( windyMap );
+        });
+    };
+
     onDestroy(() => {
         openedPopup?.remove();
         windyMap.removeLayer;
