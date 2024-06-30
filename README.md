@@ -1,6 +1,7 @@
 # Windy Plugin - Föhn Cross Sections - Alps
 
-Plugin to determine the Foehn potential along different cross sections in the alps
+Plugin to determine the Foehn potential along different cross sections in the alps.
+Bise and Bora are also available.
 
 ## Please note:
 
@@ -15,8 +16,9 @@ To be done
 ## Basic usage
 
 In the upper part of the right hand panel choose a cross section.
-The map view focusses at the chosen cross section and denotes the wind at 700  hPa in the middle between the ends of the cross section.
 On the right hand panel the pressure difference between the two locations is shown.
+The map view focusses at the chosen cross section and denotes the wind at 700  hPa in the middle between the ends of the cross section.
+
 
 
 ![alt text](screenshot.jpg)
