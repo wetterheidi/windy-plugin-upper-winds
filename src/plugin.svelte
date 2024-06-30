@@ -327,10 +327,9 @@
     import config from './pluginConfig';
     import Chart from './Chart.svelte';
     import type { LatLon } from '@windy/interfaces.d';
-    import store from '@windy/store';
     import { map as windyMap } from "@windy/map";
     import windyStore from "@windy/store";
-    import { onDestroy } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     //Imports für Interpolation von Werten
     import { getLatLonInterpolator } from '@windy/interpolator';
     import type { CoordsInterpolationFun } from '@windy/interpolator';
@@ -354,13 +353,13 @@
         ];
 
     //Was passiert hier?
-    store.insert('windy-plugin-foehn-cross-section', {
+    windyStore.insert('windy-plugin-foehn-cross-section', {
        def: showCrossSectionAr[4],
        allowed: showCrossSectionAr,
        save: true
     });
 
-    showCrossSection = store.get('windy-plugin-foehn-cross-section');
+    showCrossSection = windyStore.get('windy-plugin-foehn-cross-section');
 
     /* Show wind overlay at 700 hPa*/
     windyStore.set("overlay", "wind");
@@ -457,6 +456,7 @@
     }  
     }
 
+
     /* Add layer for lines to the map*/
     var activeLine = L.featureGroup().addTo(windyMap);
     let openedPopup: L.Popup | null = null;
@@ -471,15 +471,17 @@
             ], {color: 'red'}).addTo(activeLine);
     }    
 
+    
+
     function popupInfo (middleLatitude: number, middleLongitude: number) {
         /* Interpolate wind values for the selected cross section*/
-        
-        getLatLonInterpolator().then((interpolateLatLon: CoordsInterpolationFun | null) => {
+            getLatLonInterpolator().then((interpolateLatLon: CoordsInterpolationFun | null) => {
             let html = `${showCrossSection}<br />`;
             const [lat, lon] = [middleLatitude, middleLongitude];
+
             if (!interpolateLatLon) {
-                    html += 'No interpolator available<br />for this overlay';
-                } else if (store.get('overlay') !== 'wind') {
+                    html += 'Do not reload this plugin.<br /> Start it again!';
+                } else if (windyStore.get('overlay') !== 'wind') {
                     html +=
                         'For sake of the simplicity, we<br />interpolate only wind values.<br />Please select wind overlay.';
                 } else {
@@ -489,7 +491,6 @@
 
                     if (Array.isArray(interpolated)) {
                         // I everything works well, we should get raw meterological values
-
                         const { dir, wind } = wind2obj(interpolated);
 
                         // This will convert wind speed form m/s to user's preferred units
@@ -508,7 +509,16 @@
                     .setContent(html)
                     .openOn( windyMap );
         });
+        
     };
+
+    onMount(() => {
+        console.log("Mount");
+        const timeChangedEventId = windyStore.on('timestamp', () => {
+            console.log(windyStore.get('timestamp'));
+            popupInfo(locations.middleOfInnsbruckMünchen.lat, locations.middleOfInnsbruckMünchen.lon);
+        });
+    });
 
     onDestroy(() => {
         openedPopup?.remove();
