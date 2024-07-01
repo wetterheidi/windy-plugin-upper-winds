@@ -12,14 +12,27 @@
     <p>
         <label
             >In these charts, the pressure difference between
-            <select bind:value={showCrossSection} id="CS">
+            <!-- <select bind:value={csIndex} id="CS">
                 {#each showCrossSectionAr as selectedCrossSection}
-                    <option value={selectedCrossSection}>{selectedCrossSection}</option>
+                    <option value={csIndex}>{selectedCrossSection}</option>
+                {/each}
+            </select> -->
+
+            <select bind:value={csIndex} id="CS">
+                {#each crossSections as cs, index}
+                    <option value={index}>{cs.start} - {cs.end}</option>
                 {/each}
             </select>
             is represented.
+      <h2 class="mb-10">foobar {csIndex}</h2>
 
-            {#if showCrossSection == 'Genf - Zürich'}
+             <!--
+            {#each crossSections[csIndex].models as model}
+            <h2 class="mb-10">foobar {model} </h2>
+
+            {/each} -->
+
+            <!-- {#if showCrossSection == 'Genf - Zürich'}
                 <h2 class="mb-10">Bise Chart ICON</h2>
                 <Chart
                     pointTop={locations.Genf}
@@ -336,7 +349,7 @@
                 <p>
                     Bora: pressure differences of -4 hPa, Stormy Bora: pressure difference of -8 hPa
                 </p>
-            {/if}
+            {/if} -->
         </label>
     </p>
 </section>
@@ -345,7 +358,7 @@
     import bcast from '@windy/broadcast';
     import config from './pluginConfig';
     import Chart from './Chart.svelte';
-    import  { LatLon } from '@windy/interfaces.d';
+    import type { LatLon } from '@windy/interfaces.d';
     import { map as windyMap } from '@windy/map';
     import windyStore from '@windy/store';
     import { onDestroy, onMount } from 'svelte';
@@ -354,6 +367,9 @@
     import type { CoordsInterpolationFun } from '@windy/interpolator';
     import { wind2obj } from '@windy/utils';
     import metrics from '@windy/metrics';
+
+    import { crossSections, endPoints } from 'src/static';
+    import type { Modell } from 'src/types';
 
     const { title, name } = config;
 
@@ -370,38 +386,15 @@
     ];
 
     // set default cross section
-    let showCrossSection = showCrossSectionAr[0];
+    let showCrossSection = 0; // showCrossSectionAr[0];
+
+    let csIndex = 0;
 
     /* Show wind overlay at 700 hPa*/
     windyStore.set('overlay', 'wind');
     windyStore.set('level', '700h');
 
-    type Location =
-        | 'Innsbruck'
-        | 'München'
-        | 'Zürich'
-        | 'Lugano'
-        | 'Genf'
-        | 'Stuttgart'
-        | 'Bozen'
-        | 'Salzburg'
-        | 'Klagenfurt'
-        | 'Linz'
-        | 'Graz'
-        | 'Brescia'
-        | 'Maribor'
-        | 'Triest'
-        | 'middleOfMariborTriest'
-        | 'middleOfGenfZürich'
-        | 'middleOfLuganoZürich'
-        | 'middleOfZürichStuttgart'
-        | 'middleOfBozenInnsbruck'
-        | 'middleOfInnsbruckMünchen'
-        | 'middleOfKlagenfurtSalzburg'
-        | 'middleOfGrazLinz'
-        | 'middleOfBresciaBozen';
-
-    const locations: Record<Location, LatLon> = {
+    const locations: Record<string, LatLon> = {
         Innsbruck: { lat: 47.260765, lon: 11.34686 },
         München: { lat: 48.163363, lon: 11.54339 },
         Zürich: { lat: 47.45734, lon: 8.554624 },
@@ -427,7 +420,22 @@
         middleOfMariborTriest: { lat: 46.051944, lon: 14.744167 },
     };
 
-    type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
+    // type Section
+    // const crossSections: Record<string, string, string>[number] = [
+    //     ['Genf', 'Zürich', 'Foehn'],
+    //     ['Lugano', 'Zürich'],
+    //     ['Zürich', 'Stuttgart'],
+    //     ['Bozen', 'Innsbruck'],
+    //     ['Innsbruck', 'München'],
+    //     ['Klagenfurt', 'Salzburg'],
+    //     ['Graz', 'Linz'],
+    //     ['Brescia', 'Bozen'],
+    //     ['Maribor', 'Triest'],
+    // ];
+
+    let currentCS = 0;
+
+    // type Modell = 'ICON' | 'ICOND2' | 'ECMWF';
 
     const nwm: Record<Modell, string> = {
         ECMWF: 'ecmwf',
@@ -436,14 +444,23 @@
     };
 
     // https://gis.stackexchange.com/questions/123542/leafletjs-get-latlng-center-position-of-polyline
-    function midPoint(src: LatLon, dst: LatLon) : LatLon {
-        let srcLatRad = src.lat  * (Math.PI / 180);
-        let dstLatRad = dst.lat  * (Math.PI / 180);
-        let middleLatRad = Math.atan(Math.sinh(Math.log(Math.sqrt((Math.tan(dstLatRad)+1/Math.cos(dstLatRad))*(Math.tan(srcLatRad)+1/Math.cos(srcLatRad))))));
+    function midPoint(src: LatLon, dst: LatLon): LatLon {
+        let srcLatRad = src.lat * (Math.PI / 180);
+        let dstLatRad = dst.lat * (Math.PI / 180);
+        let middleLatRad = Math.atan(
+            Math.sinh(
+                Math.log(
+                    Math.sqrt(
+                        (Math.tan(dstLatRad) + 1 / Math.cos(dstLatRad)) *
+                            (Math.tan(srcLatRad) + 1 / Math.cos(srcLatRad)),
+                    ),
+                ),
+            ),
+        );
 
-        let middleLat = middleLatRad * (180 / Math.PI)
+        let middleLat = middleLatRad * (180 / Math.PI);
         let middleLng = (src.lon + dst.lon) / 2;
-        return { lat: middleLat, lon: middleLng }
+        return { lat: middleLat, lon: middleLng };
     }
 
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
@@ -455,13 +472,10 @@
                 locations.Zürich.lat,
                 locations.Zürich.lon,
             );
-            let midpoint = midPoint(locations.Genf,locations.Zürich);
+            let midpoint = midPoint(locations.Genf, locations.Zürich);
             popupInfo(midpoint.lat, midpoint.lon);
             // popupInfo(locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon);
-            windyMap.setView(
-                [midpoint.lat, midpoint.lon],
-                8,
-            );
+            windyMap.setView([midpoint.lat, midpoint.lon], 8);
         } else if (showCrossSection == 'Lugano - Zürich') {
             drawLine(
                 locations.Lugano.lat,
@@ -565,7 +579,7 @@
                 8,
             );
         } else if (showCrossSection == '') {
-            alert('No cross section is selected!');
+            console.log('No cross section is selected!');
         }
     }
 
