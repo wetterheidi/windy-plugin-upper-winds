@@ -8,36 +8,32 @@
     >
         {title}
     </div>
-
     <p>
-        <label
-            >In these charts, the pressure difference between
+        In these charts, the pressure difference between
 
-            <select bind:value={csIndex} id="CS">
-                {#each crossSections as cs, index}
-                    <option value={index}>{cs.start} - {cs.end}</option>
-                {/each}
-            </select>
-            is represented.
-            <!-- <h2 class="mb-10">foobar {csIndex} {crossSections[csIndex]}</h2> -->
-
-            {#each crossSections[csIndex].models as model}
-                {@const cs = crossSections[csIndex]}
-                <h2 class="mb-10">{cs.windName} Chart {model}</h2>
-                <Chart
-                    pointTop={endPoints[cs.start]}
-                    pointBottom={endPoints[cs.end]}
-                    forecastModel={nwm[model]}
-                    nameOfThisPlugin={name}
-                    topText={cs.topText}
-                    bottomText={cs.bottomText}
-                />
-                <p>
-                    {cs.remark}
-                </p>
-                <hr />
+        <select bind:value={csIndex} id="CS">
+            {#each crossSections as cs, index}
+                <option value={index}>{cs.start} - {cs.end}</option>
             {/each}
-        </label>
+        </select>
+        is represented.
+
+        {#each crossSections[csIndex].models as model}
+            {@const cs = crossSections[csIndex]}
+            <h2 class="mb-10">{cs.windName} Chart {model}</h2>
+            <Chart
+                pointTop={endPoints[cs.start]}
+                pointBottom={endPoints[cs.end]}
+                forecastModel={nwm[model]}
+                nameOfThisPlugin={name}
+                topText={cs.topText}
+                bottomText={cs.bottomText}
+            />
+            <p>
+                {cs.remark}
+            </p>
+            <hr />
+        {/each}
     </p>
 </section>
 
@@ -56,7 +52,6 @@
     import metrics from '@windy/metrics';
 
     import { crossSections, endPoints, nwm } from 'src/static';
-    // import { CrossSection, EndPoint, Models } from 'src/types';
 
     const { title, name } = config;
 
@@ -76,10 +71,7 @@
                 ),
             ),
         );
-
-        let middleLat = middleLatRad * (180 / Math.PI);
-        let middleLng = (src.lon + dst.lon) / 2;
-        return { lat: middleLat, lon: middleLng };
+        return { lat: middleLatRad * (180 / Math.PI), lon: (src.lon + dst.lon) / 2 };
     }
 
     function csName(i: number): string {
@@ -95,11 +87,8 @@
         const cs = crossSections[csIndex];
         const start: LatLon = endPoints[cs.start];
         const end: LatLon = endPoints[cs.end];
-
         drawLine(start, end);
-        let midpoint = midPoint(start, end);
-        popupInfo(midpoint.lat, midpoint.lon);
-        windyMap.setView([midpoint.lat, midpoint.lon], 8);
+        popupInfoFor(csIndex);
     }
 
     /* Add layer for lines to the map*/
@@ -153,7 +142,7 @@
                 .setLatLng([middleLatitude, middleLongitude])
                 .setContent(html)
                 .openOn(windyMap);
-            windyMap.panTo([middleLatitude, middleLongitude]);
+            // windyMap.panTo([middleLatitude, middleLongitude]);
         });
     }
 
@@ -161,6 +150,11 @@
     function popupInfoBetween(start: LatLon, end: LatLon) {
         let midpoint = midPoint(start, end);
         popupInfo(midpoint.lat, midpoint.lon);
+        var bounds = new L.LatLngBounds([
+            [Math.max(start.lat, end.lat), Math.max(start.lon, end.lon)],
+            [Math.min(start.lat, end.lat), Math.min(start.lon, end.lon)],
+        ]);
+        windyMap.fitBounds(bounds, { padding: [100, 100] });
     }
 
     // get locations for csIndex, compute midpoint and create popup
