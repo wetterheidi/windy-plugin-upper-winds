@@ -1,5 +1,5 @@
 <div class="mt-15">
-    <svg bind:this={svgEl}></svg>
+    <svg id="svgid" bind:this={svgEl}></svg>
 </div>
 
 <script lang="ts">
@@ -26,7 +26,11 @@
     $: {
         if (pointTop && pointBottom) {
             const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
+            const pointBottomPromise = getPointForecastData(
+                forecastModel,
+                pointBottom,
+                nameOfThisPlugin,
+            );
 
             Promise.all([pointTopPromise, pointBottomPromise]).then(
                 ([{ data: top }, { data: bottom }]: HttpPayload<
