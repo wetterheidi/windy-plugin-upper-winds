@@ -345,7 +345,7 @@
     import bcast from '@windy/broadcast';
     import config from './pluginConfig';
     import Chart from './Chart.svelte';
-    import type { LatLon } from '@windy/interfaces.d';
+    import  { LatLon } from '@windy/interfaces.d';
     import { map as windyMap } from '@windy/map';
     import windyStore from '@windy/store';
     import { onDestroy, onMount } from 'svelte';
@@ -435,6 +435,17 @@
         ICOND2: 'iconD2',
     };
 
+    // https://gis.stackexchange.com/questions/123542/leafletjs-get-latlng-center-position-of-polyline
+    function midPoint(src: LatLon, dst: LatLon) : LatLon {
+        let srcLatRad = src.lat  * (Math.PI / 180);
+        let dstLatRad = dst.lat  * (Math.PI / 180);
+        let middleLatRad = Math.atan(Math.sinh(Math.log(Math.sqrt((Math.tan(dstLatRad)+1/Math.cos(dstLatRad))*(Math.tan(srcLatRad)+1/Math.cos(srcLatRad))))));
+
+        let middleLat = middleLatRad * (180 / Math.PI)
+        let middleLng = (src.lon + dst.lon) / 2;
+        return { lat: middleLat, lon: middleLng }
+    }
+
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
     $: {
         if (showCrossSection == 'Genf - Zürich') {
@@ -444,9 +455,11 @@
                 locations.Zürich.lat,
                 locations.Zürich.lon,
             );
-            popupInfo(locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon);
+            let midpoint = midPoint(locations.Genf,locations.Zürich);
+            popupInfo(midpoint.lat, midpoint.lon);
+            // popupInfo(locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon);
             windyMap.setView(
-                [locations.middleOfGenfZürich.lat, locations.middleOfGenfZürich.lon],
+                [midpoint.lat, midpoint.lon],
                 8,
             );
         } else if (showCrossSection == 'Lugano - Zürich') {
