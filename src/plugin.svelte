@@ -154,7 +154,8 @@
             [Math.max(start.lat, end.lat), Math.max(start.lon, end.lon)],
             [Math.min(start.lat, end.lat), Math.min(start.lon, end.lon)],
         ]);
-        windyMap.fitBounds(bounds, { padding: [100, 100] });
+        // Wait for popup placement to finish before fitting map
+        setTimeout(() => windyMap.fitBounds(bounds, { padding: [395, 20] }), 100);
     }
 
     // get locations for csIndex, compute midpoint and create popup

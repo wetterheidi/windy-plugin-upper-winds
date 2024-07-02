@@ -84,6 +84,7 @@
 
         const textMargin = 20;
 
+        svgEl.innerHTML = '';
         const svg = d3.select(svgEl);
 
         const innerSvg = svg
