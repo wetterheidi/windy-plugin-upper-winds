@@ -1,5 +1,5 @@
 <div class="mt-15">
-    <svg bind:this={svgEl}></svg>
+    <svg id="svgid" bind:this={svgEl}></svg>
 </div>
 
 <script lang="ts">
@@ -26,25 +26,11 @@
     $: {
         if (pointTop && pointBottom) {
             const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
-
-            Promise.all([pointTopPromise, pointBottomPromise]).then(
-                ([{ data: top }, { data: bottom }]: HttpPayload<
-                    WeatherDataPayload<DataHash>
-                >[]) => {
-                    const topData = top.data;
-                    const bottomData = bottom.data;
-                    const tsValues = calculatePressureDifference(topData, bottomData);
-                    const midnights = getAllMidnights(top.summary);
-                    drawTheGraph(tsValues, midnights);
-                },
+            const pointBottomPromise = getPointForecastData(
+                forecastModel,
+                pointBottom,
+                nameOfThisPlugin,
             );
-        }
-    }    
-    $: {
-        if (pointTop && pointBottom) {
-            const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
 
             Promise.all([pointTopPromise, pointBottomPromise]).then(
                 ([{ data: top }, { data: bottom }]: HttpPayload<
@@ -59,29 +45,6 @@
             );
         }
     }
-    $: {
-        if (pointTop && pointBottom) {
-            const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData(forecastModel, pointBottom, nameOfThisPlugin);
-
-            Promise.all([pointTopPromise, pointBottomPromise]).then(
-                ([{ data: top }, { data: bottom }]: HttpPayload<
-                    WeatherDataPayload<DataHash>
-                >[]) => {
-                    const topData = top.data;
-                    const bottomData = bottom.data;
-                    const tsValues = calculatePressureDifference(topData, bottomData);
-                    const midnights = getAllMidnights(top.summary);
-                    drawTheGraph(tsValues, midnights);
-                },
-            );
-        }
-    }
-    
-   /* const getPointTop = (summary: Record<YearMonthDay, SummaryDay>): Timestamp[] => {
-        return pointTop;
-    };*/
-
 
     const getAllMidnights = (summary: Record<YearMonthDay, SummaryDay>): Timestamp[] => {
         return Object.keys(summary).map(key => summary[key].timestamp);
@@ -121,6 +84,7 @@
 
         const textMargin = 20;
 
+        svgEl.innerHTML = '';
         const svg = d3.select(svgEl);
 
         const innerSvg = svg
@@ -179,7 +143,7 @@
                 .attr('y', textMargin)
                 .attr('text-anchor', 'end')
                 .attr('alignment-baseline', 'hanging')
-                .attr('font-size', '25px')
+                .attr('font-size', '30px')
                 .attr('opacity', 0.5)
                 .attr('fill', 'white')
                 .text(topText);
@@ -193,7 +157,7 @@
                 .attr('y', height - textMargin)
                 .attr('text-anchor', 'end')
                 .attr('alignment-baseline', 'ideographic')
-                .attr('font-size', '25px')
+                .attr('font-size', '30px')
                 .attr('opacity', 0.5)
                 .attr('fill', 'white')
                 .text(bottomText);
@@ -204,7 +168,7 @@
             .append('path')
             .datum(lineData)
             .attr('fill', 'none')
-            .attr('stroke', 'yellow')
+            .attr('stroke', 'orange')
             .attr('stroke-width', 3)
             .attr('d', line);
 

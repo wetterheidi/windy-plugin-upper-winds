@@ -10,7 +10,7 @@ const config: ExternalPluginConfig = {
     repository: 'https://github.com/wetterheidi/windy-plugin-foehn-cross-section',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
-    routerPath: '/foehn-chart',
+    routerPath: '/foehn-chart-alps',
     desktopWidth: 800,
 };
 
