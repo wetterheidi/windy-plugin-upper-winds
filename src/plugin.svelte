@@ -132,7 +132,7 @@
                     // This will convert wind speed form m/s to user's preferred units
                     const windSpeed = metrics.wind.convertValue(wind);
 
-                    html += `<font color = red> Wind: ${dir}° ${windSpeed}<br /></font>`;
+                    html += `<b> Wind: ${dir}° ${windSpeed}<br /></b>`;
                 } else {
                     html += 'No interpolated values available for this position';
                 }
@@ -152,11 +152,11 @@
         let midpoint = midPoint(start, end);
         popupInfo(midpoint.lat, midpoint.lon);
         var bounds = new L.LatLngBounds([
-            [Math.max(start.lat, end.lat), Math.max(start.lon, end.lon)],
-            [Math.min(start.lat, end.lat), Math.min(start.lon, end.lon)],
+            [Math.max(start.lat, end.lat)+0.5, Math.max(start.lon, end.lon)+0.5],
+            [Math.min(start.lat, end.lat)-0.5, Math.min(start.lon, end.lon)-0.5],
         ]);
         // Wait for popup placement to finish before fitting map
-        /* Windy bug:  They have modified the fitBounds function to fit the map when the pane is open,   but still use the original map width. So padding:[ half of pane width + your padding, your padding ].*/
+        /* Windy bug:  They have modified the fitBounds function to fit the map when the pane is open, but still use the original map width. So padding:[ half of pane width + your padding, your padding ].*/
 
         setTimeout(() => windyMap.fitBounds(bounds, { padding: [395, 20] }), 100);
     }
@@ -186,40 +186,6 @@
 <style lang="less">
     p {
         line-height: 1.8;
-    }
-    .weather-stats {
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-        background-color: ivory;
-        th {
-            color: black; /* Sets the text color of headers to black */
-            background-color: #f0f0f0; /* Optional: sets a light gray background for better contrast */
-        }
-        label {
-            font-weight: bold;
-        }
-        .stat {
-            margin-bottom: 5px;
-        }
-        table {
-            width: 100%; // Ensures the table takes the full width of its container
-        }
-        .green-text {
-            color: green;
-        } /* Dark green */
-        .yellow-text {
-            color: #daa520;
-        }
-        .red-text {
-            color: red;
-        } /* Firebrick red */
-        .blue-text {
-            color: blue;
-        }
-        .black-text {
-            color: black;
-        }
     }
 
 </style>
