@@ -1,5 +1,5 @@
 <div class="mt-15">
-    <svg bind:this={svgEl}></svg>
+    <svg id="svgid" bind:this={svgEl}></svg>
 </div>
 
 <script lang="ts">
@@ -14,6 +14,7 @@
     export let pointTop: LatLon;
     export let pointBottom: LatLon;
     export let nameOfThisPlugin: string;
+    export let forecastModel: string;
 
     export let topText: string | undefined = undefined;
     export let bottomText: string | undefined = undefined;
@@ -24,8 +25,12 @@
 
     $: {
         if (pointTop && pointBottom) {
-            const pointTopPromise = getPointForecastData('ecmwf', pointTop, nameOfThisPlugin);
-            const pointBottomPromise = getPointForecastData('ecmwf', pointBottom, nameOfThisPlugin);
+            const pointTopPromise = getPointForecastData(forecastModel, pointTop, nameOfThisPlugin);
+            const pointBottomPromise = getPointForecastData(
+                forecastModel,
+                pointBottom,
+                nameOfThisPlugin,
+            );
 
             Promise.all([pointTopPromise, pointBottomPromise]).then(
                 ([{ data: top }, { data: bottom }]: HttpPayload<
@@ -79,6 +84,7 @@
 
         const textMargin = 20;
 
+        svgEl.innerHTML = '';
         const svg = d3.select(svgEl);
 
         const innerSvg = svg

@@ -7,19 +7,11 @@
     "scripts": {
         "build": "rm -rf dist && mkdir dist && SERVE=false rollup -c && cp package.json dist/",
         "start": "rollup -w -c",
-        "example01": "CONFIG=example01 rollup -w -c",
-        "example02": "CONFIG=example02 rollup -w -c",
-        "example03": "CONFIG=example03 rollup -w -c",
-        "example04": "CONFIG=example04 rollup -w -c",
-        "example05": "CONFIG=example05 rollup -w -c",
-        "example06": "CONFIG=example06 rollup -w -c",
-        "example07": "CONFIG=example07 rollup -w -c",
-        "build:all-examples": "for number in 01 02 03 04 05 06; do CONFIG=example$number SERVE=false rollup -c; done",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/windycom/windy-plugin-template.git"
+        "url": "git+https://github.com/wetterheidi/windy-plugin-foehn-cross-section.git"
     },
     "keywords": [
         "windy",
@@ -34,5 +26,8 @@
     "homepage": "https://docs.windy-plugins.com/",
     "dependencies": {
         "@windycom/plugin-devtools": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/jquery": "^3.5.30"
     }
 }
