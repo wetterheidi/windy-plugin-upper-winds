@@ -29,11 +29,11 @@
                 topText={cs.topText}
                 bottomText={cs.bottomText}
             />
-            <p>
-                {cs.remark}
-            </p>
-            <hr />
+                        <hr />
         {/each}
+        
+        {crossSections[csIndex].remark}
+       
     </p>
 </section>
 
@@ -51,11 +51,12 @@
     import { wind2obj } from '@windy/utils';
     import metrics from '@windy/metrics';
 
+    /* Variables are set in src/static */
     import { crossSections, endPoints, nwm } from 'src/static';
 
     const { title, name } = config;
 
-    let csIndex = 0; // set default cross section
+    let csIndex = 4; // set default cross section
 
     // https://gis.stackexchange.com/questions/123542/leafletjs-get-latlng-center-position-of-polyline
     function midPoint(src: LatLon, dst: LatLon): LatLon {
@@ -115,7 +116,7 @@
             const [lat, lon] = [middleLatitude, middleLongitude];
 
             if (!interpolateLatLon) {
-                html += 'Do not reload this plugin.<br /> Start it again!';
+                html += '<tr green-text > Do not reload this plugin.<br /> Start it again!';
             } else if (windyStore.get('overlay') !== 'wind') {
                 html +=
                     'For sake of the simplicity, we<br />interpolate only wind values.<br />Please select wind overlay.';
@@ -131,7 +132,7 @@
                     // This will convert wind speed form m/s to user's preferred units
                     const windSpeed = metrics.wind.convertValue(wind);
 
-                    html += `Wind: ${dir}° ${windSpeed}<br />`;
+                    html += `<font color = red> Wind: ${dir}° ${windSpeed}<br /></font>`;
                 } else {
                     html += 'No interpolated values available for this position';
                 }
@@ -155,6 +156,8 @@
             [Math.min(start.lat, end.lat), Math.min(start.lon, end.lon)],
         ]);
         // Wait for popup placement to finish before fitting map
+        /* Windy bug:  They have modified the fitBounds function to fit the map when the pane is open,   but still use the original map width. So padding:[ half of pane width + your padding, your padding ].*/
+
         setTimeout(() => windyMap.fitBounds(bounds, { padding: [395, 20] }), 100);
     }
 
@@ -184,4 +187,39 @@
     p {
         line-height: 1.8;
     }
+    .weather-stats {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        background-color: ivory;
+        th {
+            color: black; /* Sets the text color of headers to black */
+            background-color: #f0f0f0; /* Optional: sets a light gray background for better contrast */
+        }
+        label {
+            font-weight: bold;
+        }
+        .stat {
+            margin-bottom: 5px;
+        }
+        table {
+            width: 100%; // Ensures the table takes the full width of its container
+        }
+        .green-text {
+            color: green;
+        } /* Dark green */
+        .yellow-text {
+            color: #daa520;
+        }
+        .red-text {
+            color: red;
+        } /* Firebrick red */
+        .blue-text {
+            color: blue;
+        }
+        .black-text {
+            color: black;
+        }
+    }
+
 </style>

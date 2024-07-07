@@ -62,7 +62,7 @@ export const crossSections: CrossSection[] = [
         start: 'Maribor', end: 'Triest', windName: 'Bora',
         models: ['ICON', 'ICON-D2', 'ECMWF'],
         bottomText: 'Bora ⬅',
-        remark: 'Bora: pressure differences of -4 hPa, Stormy Bora: pressure difference of -8 hPa'
+        remark: 'Bora: easterly winds and pressure differences of -4 hPa, Stormy Bora: pressure difference of -8 hPa'
     },
 ];
 
@@ -88,3 +88,4 @@ export const nwm: Models = {
     'ICON': 'icon',
     'ICON-D2': 'iconD2',
 };
+
