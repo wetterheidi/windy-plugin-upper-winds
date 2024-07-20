@@ -20,28 +20,6 @@ export class Utility {
     return `${nameRegion} (${formattedLat}, ${formattedLon})`;
   }
 
-  static prediction(temperature: number, applemanCutoff: number, persistentCutoff: number, humidityIce: number, humidityWater: number): string {
-    // First check if temperature is above the applemanCutoff, return an empty string if true
-    if (temperature > applemanCutoff) {
-      return '';
-    }
-
-    // Check for persistent contrails first since it has specific combined conditions
-    if (humidityIce >= 100 && temperature <= persistentCutoff) {
-      return "Long, possibly persistent";
-    }
-
-    // Next, determine the contrail type based on humidityIce
-    if (humidityIce < 30) {
-      return "Minimal contrails may be seen";
-    } else if (humidityIce >= 30 && humidityIce < 85) {
-      return "Short contrails possible";
-    } else { // humidityIce >= 85
-      return "Longer contrails possible";
-    }
-  }
-
-
 }
 
 

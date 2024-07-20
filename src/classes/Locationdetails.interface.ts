@@ -6,4 +6,4 @@ export interface LocationDetails {
     name: string;
     nameValid: boolean;
     region: string;
-}
+}   
