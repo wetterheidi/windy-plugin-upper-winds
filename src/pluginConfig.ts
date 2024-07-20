@@ -7,7 +7,7 @@ const config: ExternalPluginConfig = {
     title: 'Upper winds',
     description: 'Show upper winds, temperature and humidity at a given position',
     author: 'Heidi Schmid',
-    repository: 'https://github.com/IoanaLogafatu/windy-plugin-contrails',
+    repository: 'https://github.com/wetterheidi/windy-plugin-upper-winds.git',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
     routerPath: '/contrails',
