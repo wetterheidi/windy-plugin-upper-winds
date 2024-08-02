@@ -173,8 +173,7 @@ export class Contrail {
 
     /**
      * Converts the raw data, sorted by pressure, into interpolated data layered by flight levels.
-     * The interpolation is done for every 1000 feet, starting from the highest point down to the lowest,
-     * but not below 20000 feet.
+     * The interpolation is done for every 1000 feet, starting from the highest point down to the lowest.
      *
      * @param {Sounding[]} data - The array of sounding data objects, each containing height and other meteorological data.
      * @returns {Sounding[]} - The array of stratified data objects, each representing an interpolated flight level.

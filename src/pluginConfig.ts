@@ -10,7 +10,7 @@ const config: ExternalPluginConfig = {
     repository: 'https://github.com/wetterheidi/windy-plugin-upper-winds.git',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
-    routerPath: '/contrails',
+    routerPath: '/upper-winds',
     listenToSingleclick: true,
     addToContextmenu: true,
     private: true

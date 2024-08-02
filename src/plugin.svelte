@@ -10,7 +10,7 @@
     </div>
 
     {#if !ready}
-        <h4>Click on map to generate an analysis</h4>
+        <h4>Click on map to generate an upper wind table</h4>
     {:else}
         <h4>{clickLocation}</h4>
         <h4>{forecastDate}</h4>
@@ -99,6 +99,9 @@
         // Your plugin was destroyed
     });
 
+    /* Assigns the Analysis to a location and a model
+    TODO: Make it possible to go foreward in time
+    */
     function assignAnalysis(contrail: Contrail) {
         clickLocation = contrail.clickLocation;
         flightLevels = contrail.flightLevels;
