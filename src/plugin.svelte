@@ -26,6 +26,7 @@
                         <th>p</th>
                         <th>T</th>
                         <th>RHw</th>
+                        <th>Td</th>
                     </tr>
                     <tr>
                         <th>ft</th>
@@ -34,10 +35,11 @@
                         <th>hPa</th>
                         <th>°C</th>
                         <th>%</th>
+                        <th>°C</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {#each flightLevels as { height, windDirection, windSpeed, pressure, temperature, humidityWater }}
+                    {#each flightLevels as { height, windDirection, windSpeed, pressure, temperature, humidityWater, dewPointt }}
                         <tr
                             class:green-text={temperature > -0.5 && temperature < 0.5}
                             class:blue-text={temperature <= -0.5}
@@ -49,6 +51,7 @@
                             <td>{pressure}</td>
                             <td>{temperature}</td>
                             <td>{humidityWater}</td>
+                            <td>{dewPointt}</td>
                         </tr>
                     {/each}
                 </tbody>
