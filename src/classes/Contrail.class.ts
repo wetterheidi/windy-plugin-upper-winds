@@ -1,12 +1,12 @@
 import store from '@windy/store';
 import reverseName from '@windy/reverseName';
-import { Utility } from './Utility.class';
 import windyFetch from '@windy/fetch';
-import { Sounding } from './Sounding.interface';
 import {
     MeteogramDataPayload,
     MeteogramDataHash,
 } from '@windycom/plugin-devtools/types/interfaces';
+import { Sounding } from './Sounding.interface';
+import { Utility } from './Utility.class';
 
 
 export class Contrail {
@@ -105,7 +105,7 @@ export class Contrail {
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
                 //hier wind mit einbauen
-                const windDirection = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn]-273.15).toFixed(0); 
+                const windDirection = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn]- 273.15).toFixed(0); 
                 const windSpeed = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn]- 273.15).toFixed(0); 
                  //hier wind mit einbauen
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius

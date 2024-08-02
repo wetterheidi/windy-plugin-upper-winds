@@ -86,7 +86,7 @@
     };
 
     onMount(() => {
-        singleclick.on('windy-plugin-contrails', async ev => {
+        singleclick.on('windy-plugin-upper-winds', async ev => {
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(contrail);
         });
