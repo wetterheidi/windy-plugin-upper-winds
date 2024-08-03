@@ -100,19 +100,20 @@ export class Contrail {
                 const suffix = key.split('gh-')[1]; // Get the suffix to match other data
                 const tempKey = `temp-${suffix}`;
                 const humidityKey = `rh-${suffix}`;
-                const windKey = `wind-${suffix}`;
+                const dewpointKey = `dewpoint-${suffix}`;
+                const wind_uKey = `wind_u-${suffix}`;
+                const wind_vKey = `wind_v-${suffix}`;
 
-                //Betrifft nur  Boden?????
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
                 //hier wind mit einbauen
-                const windDirection = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn]- 273.15).toFixed(0); 
-                const windSpeed = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn]- 273.15).toFixed(0); 
+                const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
+                const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
                  //hier wind mit einbauen
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
-                const dewPointt = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
+                const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
                 
                
 
@@ -121,8 +122,8 @@ export class Contrail {
                     height,
                     temperature,
                     humidityWater,
-                    windDirection,
-                    windSpeed,
+                    wind_u,
+                    wind_v,
                     dewPointt,
                 });
             
@@ -147,7 +148,7 @@ export class Contrail {
         //Do not interpolate below 10 feet, set endHeight to 1 instead of 0 to avoid a "NaN" for the lowest pressure value
         if (endHeight < 1000) {
             endHeight = 1;
-        } 
+        }
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {
@@ -197,9 +198,21 @@ export class Contrail {
             ratio,
         );
 
-        const wind = Utility.linearInterpolation(
-            upper.wind,
-            lower.wind,
+        const dewPointt = Utility.linearInterpolation(
+            upper.dewPointt,
+            lower.dewPointt,
+            ratio,
+        );
+
+        const wind_u = Utility.linearInterpolation(
+            upper.wind_u,
+            lower.wind_u,
+            ratio,
+        );
+
+        const wind_v = Utility.linearInterpolation(
+            upper.wind_v,
+            lower.wind_v,
             ratio,
         );
 
@@ -208,9 +221,9 @@ export class Contrail {
             pressure: pressure,
             temperature: temperature,
             humidityWater: humidityWater,
-            windDirection: temperature,
-            windSpeed: temperature,
-            dewPointt: humidityWater,
+            wind_u: wind_u,
+            wind_v: wind_v,
+            dewPointt: dewPointt,
         };
 
         return interpolated;

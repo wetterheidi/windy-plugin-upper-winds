@@ -21,8 +21,8 @@
                 <thead>
                     <tr>
                         <th>h</th>
-                        <th>Dir</th>
-                        <th>Speed</th>
+                        <th>u</th>
+                        <th>v</th>
                         <th>p</th>
                         <th>T</th>
                         <th>RHw</th>
@@ -30,8 +30,8 @@
                     </tr>
                     <tr>
                         <th>ft</th>
-                        <th>°</th>
-                        <th>kt</th>
+                        <th>m/s</th>
+                        <th>m/s</th>
                         <th>hPa</th>
                         <th>°C</th>
                         <th>%</th>
@@ -39,15 +39,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each flightLevels as { height, windDirection, windSpeed, pressure, temperature, humidityWater, dewPointt }}
+                    {#each flightLevels as { height, wind_u, wind_v, pressure, temperature, humidityWater, dewPointt }}
                         <tr
                             class:green-text={temperature > -0.5 && temperature < 0.5}
                             class:blue-text={temperature <= -0.5}
                             class:red-text={temperature >= 0.5}
                         >
                             <td>{height}</td>
-                            <td>{windDirection}</td>
-                            <td>{windSpeed}</td>
+                            <td>{wind_u}</td>
+                            <td>{wind_v}</td>
                             <td>{pressure}</td>
                             <td>{temperature}</td>
                             <td>{humidityWater}</td>
