@@ -144,9 +144,10 @@ export class Contrail {
         let endHeight = Math.floor(data[data.length - 1].height / 1000) * 1000; // Lowest point, rounded down to nearest 1000
         const step = 1000;
 
-        if (endHeight < 0) {
-            endHeight = 0;
-        }
+        //Do not interpolate below 10 feet, set endHeight to 1 instead of 0 to avoid a "NaN" for the lowest pressure value
+        if (endHeight < 1000) {
+            endHeight = 1;
+        } 
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {
