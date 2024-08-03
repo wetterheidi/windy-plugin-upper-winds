@@ -44,7 +44,7 @@ export class Contrail {
     }
 
     /** Handle the click event (The request for the contrail analysis) */
-    async handleEvent(ev: { lat: any; lon: any; }) {
+    async handleEvent(ev: { lat: any; lon: any }) {
         try {
             const product = await store.get('product'); // Retrieve product (forecast model) asynchronously
             const locationObject = await reverseName.get({ lat: ev.lat, lon: ev.lon }); // Retrieve the location data
@@ -102,6 +102,7 @@ export class Contrail {
                 const humidityKey = `rh-${suffix}`;
                 const windKey = `wind-${suffix}`;
 
+                //Betrifft nur  Boden?????
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
@@ -110,8 +111,8 @@ export class Contrail {
                 const windSpeed = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn]- 273.15).toFixed(0); 
                  //hier wind mit einbauen
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
-                const humidityWater =+weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
-                const dewPointt = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
+                const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
+                const dewPointt = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 
                
 
@@ -136,7 +137,7 @@ export class Contrail {
     };
 
 
-    stratify(data: Sounding[]) {
+    private stratify(data: Sounding[]) {
         const result = [];
         // Define the range of heights for interpolation
         const startHeight = Math.floor(data[0].height / 1000) * 1000; // Highest point, rounded down to nearest 1000
@@ -178,7 +179,7 @@ export class Contrail {
      * @param {Sounding[]} data - The array of sounding data objects, each containing height and other meteorological data.
      * @returns {Sounding[]} - The array of stratified data objects, each representing an interpolated flight level.
      */
-    interpolate(lower: Sounding, upper: Sounding, targetHeight: number, previousHuman: string): Sounding {
+    private interpolate(lower: Sounding, upper: Sounding, targetHeight: number, previousHuman: string): Sounding {
         const ratio = (targetHeight - upper.height) / (lower.height - upper.height);
 
         const pressure = Utility.linearInterpolation(upper.pressure, lower.pressure, ratio);
@@ -195,6 +196,12 @@ export class Contrail {
             ratio,
         );
 
+        const wind = Utility.linearInterpolation(
+            upper.wind,
+            lower.wind,
+            ratio,
+        );
+
         const interpolated: Sounding = {
             height: targetHeight,
             pressure: pressure,
@@ -202,7 +209,7 @@ export class Contrail {
             humidityWater: humidityWater,
             windDirection: temperature,
             windSpeed: temperature,
-            Dewpointt: temperature,
+            dewPointt: humidityWater,
         };
 
         return interpolated;

@@ -1,6 +1,6 @@
 # Windy Plugin - Upper winds
 
-Plugin to get upper winds interpolated to human readable heights
+Plugin to get upper winds, temperature and humidity interpolated to human readable heights
 
 ## Please note:
 
