@@ -20,6 +20,32 @@ export class Utility {
     return `${nameRegion} (${formattedLat}, ${formattedLon})`;
   }
 
+  static windSpeed( uComponent: number , vComponent: number ): number {
+    // wind speed calculated from wind_u and wind_v component
+    let ff: number = 0;
+    ff = Math.sqrt(uComponent ** 2 + vComponent ** 2);
+    return ff;
+  }
+
+
+  static windDirection( uComponent: number ,vComponent: number): number {   
+    // wind direction calculated from wind_u and wind_v component
+    let ddd: number = 0;
+    let ff: number = 0;
+    //First calculate Speed
+    ff = Math.sqrt(uComponent ** 2 + vComponent ** 2);
+    //Then calculate Direction
+    if (vComponent >= 0 && uComponent > 0) {
+       ddd = 90 - (Math.acos(uComponent / ff) * 180) / Math.PI;
+    } else if (vComponent >= 0 && uComponent < 0) {
+       ddd = 90 - (Math.acos(uComponent / ff) * 180) / Math.PI + 360;
+    } else if (vComponent < 0) {
+       ddd = 90 + (Math.acos(uComponent / ff) * 180) / Math.PI;
+    }
+    ddd = (ddd + 180) % 360;
+    return ddd;
+  }
+
 }
 
 
