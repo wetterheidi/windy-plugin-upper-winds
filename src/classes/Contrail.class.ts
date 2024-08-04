@@ -104,12 +104,15 @@ export class Contrail {
                 const wind_uKey = `wind_u-${suffix}`;
                 const wind_vKey = `wind_v-${suffix}`;
 
+
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
                 //hier wind mit einbauen
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
+                const windDir = +(Utility.windDirection(wind_u, wind_v)).toFixed(this._forecastColumn); // Calculate wind direction
+                const windSp = +(Utility.windSpeed(wind_u, wind_v)* 3.6 / 1.852).toFixed(this._forecastColumn); // Calculate wind speed and convert to kt
                  //hier wind mit einbauen
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
@@ -124,6 +127,8 @@ export class Contrail {
                     humidityWater,
                     wind_u,
                     wind_v,
+                    windDir,
+                    windSp,
                     dewPointt,
                 });
             
@@ -216,6 +221,18 @@ export class Contrail {
             ratio,
         );
 
+        const windDir = Utility.linearInterpolation(
+            upper.windDir,
+            lower.windDir,
+            ratio,
+        );
+
+        const windSp = Utility.linearInterpolation(
+            upper.windSp,
+            lower.windSp,
+            ratio,
+        );
+
         const interpolated: Sounding = {
             height: targetHeight,
             pressure: pressure,
@@ -223,6 +240,8 @@ export class Contrail {
             humidityWater: humidityWater,
             wind_u: wind_u,
             wind_v: wind_v,
+            windDir: windDir,
+            windSp: windSp,
             dewPointt: dewPointt,
         };
 
