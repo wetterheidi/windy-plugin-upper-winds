@@ -9,7 +9,7 @@ import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
 
 
-export class Contrail {
+export class UpperWind {
 
     /** The raw data from Windy - arranged by pressure */
     private _rawdata: Sounding[] = [];
@@ -43,7 +43,7 @@ export class Contrail {
         return this._model;
     }
 
-    /** Handle the click event (The request for the contrail analysis) */
+    /** Handle the click event (The request for the upper wind analysis) */
     async handleEvent(ev: { lat: any; lon: any }) {
         try {
             const product = await store.get('product'); // Retrieve product (forecast model) asynchronously

@@ -17,45 +17,45 @@
         <hr />
         <h4>Upper winds, temperature and humidity</h4>
         <div class="weather-stats">
-            <table>
-                <thead>
-                    <tr>
-                        <th>h</th>
-                        <th>Dir</th>
-                        <th>Speed</th>
-                        <th>p</th>
-                        <th>T</th>
-                        <th>RHw</th>
-                        <th>Td</th>
-                    </tr>
-                    <tr>
-                        <th>ft</th>
-                        <th>°</th>
-                        <th>kt</th>
-                        <th>hPa</th>
-                        <th>°C</th>
-                        <th>%</th>
-                        <th>°C</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each flightLevels as { height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
-                        <tr
-                            class:green-text={temperature > -0.5 && temperature < 0.5}
-                            class:blue-text={temperature <= -0.5}
-                            class:red-text={temperature >= 0.5}
-                        >
-                            <td>{height}</td>
-                            <td>{windDir}</td>
-                            <td>{windSp}</td>
-                            <td>{pressure}</td>
-                            <td>{temperature}</td>
-                            <td>{humidityWater}</td>
-                            <td>{dewPointt}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
+                 <table>
+                     <thead>
+                            <tr>
+                                <th>h</th>
+                                <th>Dir</th>
+                                <th>Speed</th>
+                                <th>p</th>
+                                <th>T</th>
+                                <th>Td</th>
+                                <th>RHw</th>
+                            </tr>
+                            <tr>
+                                <th>ft</th>
+                                <th>°</th>
+                                <th>kt</th>
+                                <th>hPa</th>
+                                <th>°C</th>
+                                <th>°C</th>
+                                <th>%</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {#each flightLevels as { height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
+                                <tr
+                                    class:green-text={temperature > -0.5 && temperature < 0.5}
+                                    class:blue-text={temperature <= -0.5}
+                                    class:red-text={temperature >= 0.5}
+                                >
+                                    <td>{height}</td>
+                                    <td>{windDir}0</td>
+                                    <td>{windSp}</td>
+                                    <td>{pressure}</td>
+                                    <td>{temperature}</td>
+                                    <td>{dewPointt}</td>
+                                    <td>{humidityWater}</td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
         </div>
         <hr />
     {/if}
@@ -67,7 +67,7 @@
     import { onDestroy, onMount } from 'svelte';
     import config from './pluginConfig';
     import { singleclick } from '@windy/singleclick';
-    import { Contrail } from './classes/Contrail.class';
+    import { UpperWind } from './classes/UpperWind.class';
 
     let ready = false;
     let flightLevels: any[] = [];
@@ -77,7 +77,7 @@
 
     const { title } = config;
     const { version } = config;
-    const contrail = new Contrail();
+    const contrail = new UpperWind();
 
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
@@ -92,17 +92,18 @@
         singleclick.on('windy-plugin-upper-winds', async ev => {
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(contrail);
+            //bcast.on('redrawFinished', listener);
         });
     });
 
     onDestroy(() => {
-        // Your plugin was destroyed
+       // bcast.off('redrawFinished', listener);
     });
 
     /* Assigns the Analysis to a location and a model
     TODO: Make it possible to go foreward in time
     */
-    function assignAnalysis(contrail: Contrail) {
+    function assignAnalysis(contrail: UpperWind) {
         clickLocation = contrail.clickLocation;
         flightLevels = contrail.flightLevels;
         filteredFlightLevels = flightLevels.filter(
@@ -119,9 +120,14 @@
         flex-direction: column;
         padding: 10px;
         background-color: ivory;
+        text-align: center;
         th {
             color: black; /* Sets the text color of headers to black */
             background-color: #f0f0f0; /* Optional: sets a light gray background for better contrast */
+        }
+        td {
+            text-align: right;
+            width: 14.28%; // make all columns the same width
         }
         label {
             font-weight: bold;

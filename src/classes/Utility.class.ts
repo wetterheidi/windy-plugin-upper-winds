@@ -43,6 +43,8 @@ export class Utility {
        ddd = 90 + (Math.acos(uComponent / ff) * 180) / Math.PI;
     }
     ddd = (ddd + 180) % 360;
+    ddd = Math.round(ddd / 10); //To round to hole tens. "0" is added in plugin.svelte html-Part
+   
     return ddd;
   }
 
