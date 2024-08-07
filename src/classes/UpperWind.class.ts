@@ -9,6 +9,7 @@ import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
 
 
+
 export class UpperWind {
 
     /** The raw data from Windy - arranged by pressure */
@@ -36,6 +37,8 @@ export class UpperWind {
 
     get forecastDate() {
         const date = new Date(this._forecastDate);
+        //Versuch Zeit akualisieren
+        //const date = new Date(store.get('timestamp'));
         return date.toString();
     }
 

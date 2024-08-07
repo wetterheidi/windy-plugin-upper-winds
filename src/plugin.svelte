@@ -64,10 +64,13 @@
 
 <script lang="ts">
     import bcast from '@windy/broadcast';
+    import { map } from '@windy/map';
     import { onDestroy, onMount } from 'svelte';
     import config from './pluginConfig';
     import { singleclick } from '@windy/singleclick';
     import { UpperWind } from './classes/UpperWind.class';
+    import windyStore from '@windy/store';
+    import { Utility } from './classes/Utility.class';
 
     let ready = false;
     let flightLevels: any[] = [];
@@ -79,6 +82,22 @@
     const { version } = config;
     const contrail = new UpperWind();
 
+    /* Add layer for lines to the map*/
+    var activeLayer = L.featureGroup().addTo(map);
+    var popup = L.Popup;
+    
+
+    /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
+    $: {
+        activeLayer.clearLayers();
+
+        popup = new L.Popup({ autoClose: false, closeOnClick: false, closeButton: false })
+            .setLatLng([48.0, 11.25])
+            .addTo(activeLayer)
+            .setContent(clickLocation)
+            .openOn(map);
+    }
+
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
             return; // Ignore null _params and do not execute further
@@ -87,6 +106,13 @@
         await contrail.handleEvent(_params); // Wait for handleEvent to complete
         assignAnalysis(contrail);
     };
+
+    const listener = () => {
+        console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
+        //Versuch die Werte zu ändern, sobald die Zeit geändert wurde (geht noch nicht!)
+        assignAnalysis(contrail);
+    };
+
 
     onMount(() => {
         singleclick.on('windy-plugin-upper-winds', async ev => {
@@ -97,7 +123,7 @@
     });
 
     onDestroy(() => {
-       // bcast.off('redrawFinished', listener);
+       //bcast.off('redrawFinished', listener);
     });
 
     /* Assigns the Analysis to a location and a model
@@ -109,7 +135,10 @@
         filteredFlightLevels = flightLevels.filter(
             level => level.temperature <= level.applemanTemp,
         );
+        //Original version 
         forecastDate = 'Forecast for ' + contrail.forecastDate + ' using model ' + contrail.model;
+        // Versuch!!
+        //forecastDate = 'Forecast for ' + new Date(windyStore.get('timestamp')) + ' using model ' + contrail.model;
         ready = true;
     }
 </script>
