@@ -84,18 +84,23 @@
 
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
-    var popup = L.Popup;
+    var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
+    
     
 
     /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
     $: {
         activeLayer.clearLayers();
 
-        popup = new L.Popup({ autoClose: false, closeOnClick: false, closeButton: false })
-            .setLatLng([48.0, 11.25])
-            .addTo(activeLayer)
-            .setContent(clickLocation)
-            .openOn(map);
+        function onMapClick(e: any) {
+    popup
+        .setLatLng(e.latlng)
+        .addTo(activeLayer)
+        .setContent(clickLocation)
+        .openOn(map);
+    }
+
+    map.on('click', onMapClick);
     }
 
     export const onopen = async (_params: { lat: any; lon: any }) => {
