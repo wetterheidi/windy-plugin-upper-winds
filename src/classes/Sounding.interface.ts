@@ -8,4 +8,5 @@ export interface Sounding {
     temperature: number;    // Temperature in celsius
     humidityWater: number;  // Relative humidity with respect to water (RHw)
     dewPointt: number;      // Dewpoint temperature
+    human: string;          // Human readable prediction
 }

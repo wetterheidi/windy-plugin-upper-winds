@@ -106,7 +106,7 @@ export class UpperWind {
                 const dewpointKey = `dewpoint-${suffix}`;
                 const wind_uKey = `wind_u-${suffix}`;
                 const wind_vKey = `wind_v-${suffix}`;
-
+                const human = '';
 
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
@@ -133,6 +133,7 @@ export class UpperWind {
                     windDir,
                     windSp,
                     dewPointt,
+                    human,
                 });
             
             }
@@ -246,6 +247,7 @@ export class UpperWind {
             windDir: windDir,
             windSp: windSp,
             dewPointt: dewPointt,
+            human: previousHuman,
         };
 
         return interpolated;

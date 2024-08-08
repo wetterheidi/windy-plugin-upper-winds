@@ -70,7 +70,6 @@
     import { singleclick } from '@windy/singleclick';
     import { UpperWind } from './classes/UpperWind.class';
     import windyStore from '@windy/store';
-    import { Utility } from './classes/Utility.class';
 
     let ready = false;
     let flightLevels: any[] = [];
@@ -86,13 +85,8 @@
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
     
-    
-
-    /* Center map (and place picker with wind direction and speed to) at a location refering to the cross section */
-    $: {
-        activeLayer.clearLayers();
-
-        function onMapClick(e: any) {
+    /* Create a Popup to show the clicked position*/
+    function onMapClick(e: any) {
     popup
         .setLatLng(e.latlng)
         .addTo(activeLayer)
@@ -100,14 +94,10 @@
         .openOn(map);
     }
 
-    map.on('click', onMapClick);
-    }
-
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-
         await contrail.handleEvent(_params); // Wait for handleEvent to complete
         assignAnalysis(contrail);
     };
@@ -122,6 +112,8 @@
     onMount(() => {
         singleclick.on('windy-plugin-upper-winds', async ev => {
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
+            activeLayer.clearLayers();
+            map.on('click', onMapClick);   
             assignAnalysis(contrail);
             //bcast.on('redrawFinished', listener);
         });
