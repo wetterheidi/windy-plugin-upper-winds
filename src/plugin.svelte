@@ -17,56 +17,56 @@
         <hr />
         <h4>Upper winds, temperature and humidity</h4>
         <div class="weather-stats">
-                 <table>
-                     <thead>
-                            <tr>
-                                <th>h</th>
-                                <th>Dir</th>
-                                <th>Speed</th>
-                                <th>p</th>
-                                <th>T</th>
-                                <th>Td</th>
-                                <th>RHw</th>
-                            </tr>
-                            <tr>
-                                <th>ft</th>
-                                <th>°</th>
-                                <th>kt</th>
-                                <th>hPa</th>
-                                <th>°C</th>
-                                <th>°C</th>
-                                <th>%</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {#each flightLevels as { height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
-                                <tr
-                                    class:green-text={temperature > -0.5 && temperature < 0.5}
-                                    class:blue-text={temperature <= -0.5}
-                                    class:red-text={temperature >= 0.5}
-                                >
-                                    <td>{height}</td>
-                                    <td>{windDir}0</td>
-                                    <td>{windSp}</td>
-                                    <td>{pressure}</td>
-                                    <td>{temperature}</td>
-                                    <td>{dewPointt}</td>
-                                    <td>{humidityWater}</td>
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>h</th>
+                        <th>Dir</th>
+                        <th>Speed</th>
+                        <th>p</th>
+                        <th>T</th>
+                        <th>Td</th>
+                        <th>RHw</th>
+                    </tr>
+                    <tr>
+                        <th>ft</th>
+                        <th>°</th>
+                        <th>kt</th>
+                        <th>hPa</th>
+                        <th>°C</th>
+                        <th>°C</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each flightLevels as { height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
+                        <tr
+                            class:green-text={temperature > -0.5 && temperature < 0.5}
+                            class:blue-text={temperature <= -0.5}
+                            class:red-text={temperature >= 0.5}
+                        >
+                            <td>{height}</td>
+                            <td>{windDir}0</td>
+                            <td>{windSp}</td>
+                            <td>{pressure}</td>
+                            <td>{temperature}</td>
+                            <td>{dewPointt}</td>
+                            <td>{humidityWater}</td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
         </div>
         <hr />
         <div style="text-align:center">
-            <button> Download data </button>
+            <button on:click={() => downloadData(true)}> Download CSV </button>
+            <button on:click={() => downloadData(false)}> Download JSON </button>
         </div>
     {/if}
     <hr />
 </section>
 
 <script lang="ts">
-
     /*Vorlage für Onclick Aktion des Downloadbuttons:
     <button on:click={downloadData}> Download data </button> */
 
@@ -77,12 +77,19 @@
     import { singleclick } from '@windy/singleclick';
     import { UpperWind } from './classes/UpperWind.class';
     import windyStore from '@windy/store';
+    // see https://www.npmjs.com/package/export-to-csv
+    import { mkConfig, generateCsv, asBlob } from "export-to-csv";
 
     let ready = false;
     let flightLevels: any[] = [];
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
     let forecastDate = '';
+
+    // mkConfig merges your options with the defaults
+    // and returns WithDefaults<ConfigOptions>
+    const csvConfig = mkConfig({ useKeysAsHeaders: true });
+
 
     const { title } = config;
     const { version } = config;
@@ -91,18 +98,13 @@
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
-    
+
     /* Create a Popup to show the clicked position*/
     activeLayer.clearLayers();
     function onMapClick(e: any) {
-    popup
-        .setLatLng(e.latlng)
-        .addTo(activeLayer)
-        .setContent(clickLocation)
-        .openOn(map);
+        popup.setLatLng(e.latlng).addTo(activeLayer).setContent(clickLocation).openOn(map);
     }
-    map.on('click', onMapClick);   
-
+    map.on('click', onMapClick);
 
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
@@ -118,7 +120,6 @@
         assignAnalysis(contrail);
     };
 
-
     onMount(() => {
         singleclick.on('windy-plugin-upper-winds', async ev => {
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
@@ -128,7 +129,7 @@
     });
 
     onDestroy(() => {
-       //bcast.off('redrawFinished', listener);
+        //bcast.off('redrawFinished', listener);
     });
 
     /* Assigns the Analysis to a location and a model
@@ -140,11 +141,41 @@
         filteredFlightLevels = flightLevels.filter(
             level => level.temperature <= level.applemanTemp,
         );
-        //Original version 
+        //Original version
         forecastDate = 'Forecast for ' + contrail.forecastDate + ' using model ' + contrail.model;
         // Versuch!!
         //forecastDate = 'Forecast for ' + new Date(windyStore.get('timestamp')) + ' using model ' + contrail.model;
         ready = true;
+    }
+
+    // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+    // "ES6+ version for 2021; no 1MB limit either:"
+    const saveTemplateAsFile = (filename : string, blob : Blob, mimeType : string) => {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = window.URL.createObjectURL(blob);
+        link.dataset.downloadurl = [mimeType, link.download, link.href].join(':');
+
+        const evt = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+        });
+
+        link.dispatchEvent(evt);
+        link.remove();
+    };
+
+    function downloadData(asCsv: boolean) {
+        if (asCsv) {
+            const csv = generateCsv(csvConfig)(flightLevels);
+            const blob = asBlob(csvConfig)(csv);
+            saveTemplateAsFile("flightLevels.csv", blob, 'text/csv;charset=utf-8');
+        } else {
+            const data = JSON.stringify(flightLevels, undefined, 2);
+            const blob = new Blob([data], { type: 'text/json' });
+            saveTemplateAsFile("flightLevels.json", blob, 'text/json')
+        }
     }
 </script>
 
