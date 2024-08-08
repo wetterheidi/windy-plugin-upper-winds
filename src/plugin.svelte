@@ -58,11 +58,18 @@
                     </table>
         </div>
         <hr />
+        <div style="text-align:center">
+            <button> Download data </button>
+        </div>
     {/if}
     <hr />
 </section>
 
 <script lang="ts">
+
+    /*Vorlage für Onclick Aktion des Downloadbuttons:
+    <button on:click={downloadData}> Download data </button> */
+
     import bcast from '@windy/broadcast';
     import { map } from '@windy/map';
     import { onDestroy, onMount } from 'svelte';
@@ -86,6 +93,7 @@
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
     
     /* Create a Popup to show the clicked position*/
+    activeLayer.clearLayers();
     function onMapClick(e: any) {
     popup
         .setLatLng(e.latlng)
@@ -93,6 +101,8 @@
         .setContent(clickLocation)
         .openOn(map);
     }
+    map.on('click', onMapClick);   
+
 
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
@@ -112,8 +122,6 @@
     onMount(() => {
         singleclick.on('windy-plugin-upper-winds', async ev => {
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
-            activeLayer.clearLayers();
-            map.on('click', onMapClick);   
             assignAnalysis(contrail);
             //bcast.on('redrawFinished', listener);
         });
