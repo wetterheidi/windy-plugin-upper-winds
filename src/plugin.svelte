@@ -59,8 +59,9 @@
         </div>
         <hr />
         <div style="text-align:center">
-            <button on:click={() => downloadData(true)}> Download CSV </button>
-            <button on:click={() => downloadData(false)}> Download JSON </button>
+            <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
+            <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
+            <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
         </div>
     {/if}
     <hr />
@@ -78,18 +79,17 @@
     import { UpperWind } from './classes/UpperWind.class';
     import windyStore from '@windy/store';
     // see https://www.npmjs.com/package/export-to-csv
-    import { mkConfig, generateCsv, asBlob } from "export-to-csv";
-
+    import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
+    enum Format {
+        FMT_CSV = 1,
+        FMT_JSON,
+        FMT_HEIDIS,
+    }
     let ready = false;
     let flightLevels: any[] = [];
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
     let forecastDate = '';
-
-    // mkConfig merges your options with the defaults
-    // and returns WithDefaults<ConfigOptions>
-    const csvConfig = mkConfig({ useKeysAsHeaders: true });
-
 
     const { title } = config;
     const { version } = config;
@@ -150,7 +150,7 @@
 
     // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
     // "ES6+ version for 2021; no 1MB limit either:"
-    const saveTemplateAsFile = (filename : string, blob : Blob, mimeType : string) => {
+    const saveTemplateAsFile = (filename: string, blob: Blob, mimeType: string) => {
         const link = document.createElement('a');
         link.download = filename;
         link.href = window.URL.createObjectURL(blob);
@@ -166,15 +166,43 @@
         link.remove();
     };
 
-    function downloadData(asCsv: boolean) {
-        if (asCsv) {
+    function downloadData(format: Format) {
+        if (format === Format.FMT_CSV) {
+            const csvConfig = mkConfig({
+                useKeysAsHeaders: true,
+            });
             const csv = generateCsv(csvConfig)(flightLevels);
             const blob = asBlob(csvConfig)(csv);
-            saveTemplateAsFile("flightLevels.csv", blob, 'text/csv;charset=utf-8');
-        } else {
+            saveTemplateAsFile('flightLevels.csv', blob, 'text/csv;charset=utf-8');
+        }
+        if (format === Format.FMT_JSON) {
             const data = JSON.stringify(flightLevels, undefined, 2);
             const blob = new Blob([data], { type: 'text/json' });
-            saveTemplateAsFile("flightLevels.json", blob, 'text/json')
+            saveTemplateAsFile('flightLevels.json', blob, 'text/json');
+        }
+        if (format === Format.FMT_HEIDIS) {
+            // which keys to extract into columns, by field order
+            const sequence = [
+                'height',
+                'pressure',
+                'temperature',
+                'humidityWater',
+                'wind_u',
+                'wind_v',
+                'windDir',
+                'windSp',
+                'dewPointt',
+                'human',
+            ];
+            const lineSeparator = `\n`;
+            const fieldSeparator = ' ';
+            const rowConverter = (row: any) => {
+                return sequence.map(field => `${row[field]}` + fieldSeparator).join('').slice(0, -1);
+                ;
+            };
+            const data = flightLevels.map(rowConverter).join(lineSeparator);
+            const blob = new Blob([data], { type: 'text/plain' });
+            saveTemplateAsFile('flightLevels.txt', blob, 'text/plain');
         }
     }
 </script>
