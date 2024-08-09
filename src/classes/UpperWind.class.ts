@@ -5,8 +5,10 @@ import {
     MeteogramDataPayload,
     MeteogramDataHash,
 } from '@windycom/plugin-devtools/types/interfaces';
+import windyStore from '@windy/store';
 import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
+
 
 
 
@@ -24,6 +26,16 @@ export class UpperWind {
     private _model = '';
     /** The forecast nearest to current time */
     private _forecastColumn = 0;
+    /** Forecast timestamp */
+    private _timestamp: number = Date.now();
+
+    setTime(t: number) {
+        this._timestamp = t;
+    }
+
+    get getTime() {
+        return  this._timestamp;
+    }
 
     /** Return the final data */
     get flightLevels() {
@@ -64,15 +76,12 @@ export class UpperWind {
 
   private  findNearestColumn(epoch: number[]) {
 
-        // Get the current time in Unix epoch format
-        const currentTime = Date.now();
-        
         let closestIndex = -1;
         let closestDiff = Infinity;
 
         // Iterate through the hours array to find the closest timestamp
         for (let i = 0; i < epoch.length; i++) {
-            const diff = Math.abs(epoch[i] - currentTime);
+            const diff = Math.abs(epoch[i] - this.getTime);
             if (diff < closestDiff) {
                 closestDiff = diff;
                 closestIndex = i;

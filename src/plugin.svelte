@@ -80,6 +80,7 @@
     import windyStore from '@windy/store';
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
+    import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
     enum Format {
         FMT_CSV = 1,
         FMT_JSON,
@@ -99,14 +100,7 @@
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
 
-    /* Create a Popup to show the clicked position*/
-    
-    function onMapClick(e: any) {
-        popup.setLatLng(e.latlng).addTo(activeLayer).setContent(clickLocation).openOn(map);
-    }
     activeLayer.clearLayers();
-    map.on('click', onMapClick);   
-
 
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
@@ -121,17 +115,30 @@
         //Versuch die Werte zu ändern, sobald die Zeit geändert wurde (geht noch nicht!)
         assignAnalysis(contrail);
     };
+    let position: LatLon | undefined = undefined;
 
     onMount(() => {
         singleclick.on('windy-plugin-upper-winds', async ev => {
+            position = { lat: ev.lat, lon: ev.lon };
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(contrail);
-            bcast.on('redrawFinished', listener);
+            /* Create a Popup to show the clicked position*/
+            popup
+                .setLatLng([position.lat, position.lon])
+                .setContent(clickLocation)
+                .addTo(activeLayer)
+                .openOn(map);
+        });
+        bcast.on('paramsChanged', async () => {
+            if (position === undefined) return;
+            contrail.setTime(windyStore.get('timestamp'));
+            await contrail.handleEvent(position); // Wait for handleEvent to complete
+            assignAnalysis(contrail);
         });
     });
 
     onDestroy(() => {
-       bcast.off('redrawFinished', listener); 
+        bcast.off('redrawFinished', listener);
     });
 
     /* Assigns the Analysis to a location and a model
@@ -144,9 +151,13 @@
             level => level.temperature <= level.applemanTemp,
         );
         //Original version
-        forecastDate = 'Forecast for ' + contrail.forecastDate + ' using model ' + contrail.model;
+        //forecastDate = 'Forecast for ' + contrail.forecastDate + ' using model ' + contrail.model;
         // Versuch!!
-        //forecastDate = 'Forecast for ' + new Date(windyStore.get('timestamp')) + ' using model ' + contrail.model;
+        forecastDate =
+            'Forecast for ' +
+            new Date(windyStore.get('timestamp')) +
+            ' using model ' +
+            contrail.model;
         ready = true;
     }
 
@@ -199,8 +210,10 @@
             const lineSeparator = `\n`;
             const fieldSeparator = ' ';
             const rowConverter = (row: any) => {
-                return sequence.map(field => `${row[field]}` + fieldSeparator).join('').slice(0, -1);
-                ;
+                return sequence
+                    .map(field => `${row[field]}` + fieldSeparator)
+                    .join('')
+                    .slice(0, -1);
             };
             const data = flightLevels.map(rowConverter).join(lineSeparator);
             const blob = new Blob([data], { type: 'text/plain' });
