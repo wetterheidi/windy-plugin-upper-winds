@@ -118,6 +118,7 @@
     let position: LatLon | undefined = undefined;
 
     onMount(() => {
+        /** Eventhandler for the click on the map*/
         singleclick.on('windy-plugin-upper-winds', async ev => {
             position = { lat: ev.lat, lon: ev.lon };
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
@@ -129,6 +130,7 @@
                 .addTo(activeLayer)
                 .openOn(map);
         });
+        /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
             if (position === undefined) return;
             contrail.setTime(windyStore.get('timestamp'));
@@ -141,18 +143,14 @@
         bcast.off('redrawFinished', listener);
     });
 
-    /* Assigns the Analysis to a location and a model
-    TODO: Make it possible to go foreward in time
-    */
+    /* Assigns the Analysis to a location and a model*/
     function assignAnalysis(contrail: UpperWind) {
         clickLocation = contrail.clickLocation;
         flightLevels = contrail.flightLevels;
         filteredFlightLevels = flightLevels.filter(
             level => level.temperature <= level.applemanTemp,
         );
-        //Original version
-        //forecastDate = 'Forecast for ' + contrail.forecastDate + ' using model ' + contrail.model;
-        // Versuch!!
+
         forecastDate =
             'Forecast for ' +
             new Date(windyStore.get('timestamp')) +
@@ -161,6 +159,7 @@
         ready = true;
     }
 
+    /** Download the Data  */
     // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
     // "ES6+ version for 2021; no 1MB limit either:"
     const saveTemplateAsFile = (filename: string, blob: Blob, mimeType: string) => {
@@ -196,16 +195,14 @@
         if (format === Format.FMT_HEIDIS) {
             // which keys to extract into columns, by field order
             const sequence = [
-                'height',
                 'pressure',
+                'height',
                 'temperature',
-                'humidityWater',
+                'dewPointt',
                 'wind_u',
                 'wind_v',
                 'windDir',
                 'windSp',
-                'dewPointt',
-                'human',
             ];
             const lineSeparator = `\n`;
             const fieldSeparator = ' ';
