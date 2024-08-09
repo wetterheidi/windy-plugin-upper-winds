@@ -93,7 +93,7 @@
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
     
     /* Create a Popup to show the clicked position*/
-    activeLayer.clearLayers();
+    
     function onMapClick(e: any) {
     popup
         .setLatLng(e.latlng)
@@ -101,6 +101,7 @@
         .setContent(clickLocation)
         .openOn(map);
     }
+    activeLayer.clearLayers();
     map.on('click', onMapClick);   
 
 
@@ -123,12 +124,12 @@
         singleclick.on('windy-plugin-upper-winds', async ev => {
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(contrail);
-            //bcast.on('redrawFinished', listener);
+            bcast.on('redrawFinished', listener);
         });
     });
 
     onDestroy(() => {
-       //bcast.off('redrawFinished', listener);
+       bcast.off('redrawFinished', listener); 
     });
 
     /* Assigns the Analysis to a location and a model
