@@ -14,6 +14,7 @@
     {:else}
         <h4>{clickLocation}</h4>
         <h4>{forecastDate}</h4>
+        <h4>Elevation: {elevation} ft</h4>
         <hr />
         <h4>Upper winds, temperature and humidity</h4>
         <div class="weather-stats">
@@ -81,6 +82,8 @@
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
+    import { Utility } from './classes/Utility.class';
+
     enum Format {
         FMT_CSV = 1,
         FMT_JSON,
@@ -91,6 +94,7 @@
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
     let forecastDate = '';
+    let elevation: number = 300;
 
     const { title } = config;
     const { version } = config;
@@ -123,6 +127,14 @@
             position = { lat: ev.lat, lon: ev.lon };
             await contrail.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(contrail);
+
+            /** Pick up elevation of the choosen spot*/
+            elevation = Utility.getElevation(position.lat, position.lon);
+            //setTimeout(() => (elevation = Utility.getElevation(position.lat, position.lon)), 10000);
+            console.log('Position'+position.lat + position.lon);
+            setTimeout(() => (elevation = Utility.getElevation(position.lat, position.lon)), 10000);
+            console.log('elevation'+elevation);
+
             /* Create a Popup to show the clicked position*/
             popup
                 .setLatLng([position.lat, position.lon])
