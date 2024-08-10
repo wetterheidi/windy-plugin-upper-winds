@@ -6,11 +6,12 @@ export class Utility {
   }
 
   static locationDetails(locationObject: LocationDetails): string {
+    console.log("locationObject:", locationObject)
     // Destructure the needed properties from the object
-    const { name, region, lat, lon } = locationObject;
+    const { name, region, lat, lon, nameValid } = locationObject;
 
-    // Check if name and region are the same
-    const nameRegion = name === region ? name : `${name}, ${region}`;
+    // Check if name and region are the same, checking if the nameValid property is set   
+    const nameRegion = nameValid ? name === region ? name : `${name} : ${region}` : '';
 
     // Format latitude and longitude to two decimal places
     const formattedLat = lat.toFixed(2);
