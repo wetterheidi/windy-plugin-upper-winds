@@ -5,7 +5,6 @@ import {
     MeteogramDataPayload,
     MeteogramDataHash,
 } from '@windycom/plugin-devtools/types/interfaces';
-import windyStore from '@windy/store';
 import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
 
@@ -28,6 +27,8 @@ export class UpperWind {
     private _forecastColumn = 0;
     /** Forecast timestamp */
     private _timestamp: number = Date.now();
+    /** Terrain elevation */
+    private _elevation= 0;
 
     setTime(t: number) {
         this._timestamp = t;
@@ -35,6 +36,11 @@ export class UpperWind {
 
     get getTime() {
         return  this._timestamp;
+    }
+
+    /** Return the final elevation */
+    get elevation() {
+        return this._elevation;
     }
 
     /** Return the final data */
@@ -65,6 +71,7 @@ export class UpperWind {
             const locationObject = await reverseName.get({ lat: ev.lat, lon: ev.lon }); // Retrieve the location data
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
+            this._elevation = Utility.getElevation(ev.lat, ev.lon); // Get elevation data
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;

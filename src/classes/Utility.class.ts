@@ -53,35 +53,31 @@ export class Utility {
   static getElevation(lat: number, lon: number): number {
     /** Pick up elevation data */
     //elevPntFcst = wxdata.data.header.elevation;
-    let elev: number = 0;
+    let elev: number = 12345;
     let elevRaw: number;
-    let elevfnd: boolean = true;
     console.log('An getElevation übergebene Position: ' + lat + lon);
-    if (elevfnd) {
-      elevfnd = false;
-      fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
-        method: 'GET',
+    fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
+      method: 'GET',
+    })
+      .then(r => r.json())
+      .then(r => {
+        elevRaw = r[0];
+        console.log('Raw: ' + elevRaw);
+        //setTimeout(() => (elevfnd = true), 100);
+        elev = Math.round(elevRaw * 3.28084);
+        console.log('Feet: ' + elev);
+        if (elev < 0) {
+          console.log('in der if schleife, die die elevation auf 0 setzt');
+          elev = 0;
+        }
       })
-        .then(r => r.json())
-        .then(r => {
-          elevRaw = r[0];
-          console.log('Raw: ' + elevRaw);
-          setTimeout(() => (elevfnd = true), 100);
-          elev = Math.round(elevRaw * 3.28084);
-          console.log('Feet: ' + elev);
-          if (elev < 0) {
-            elev = 0;
-          }
-        })
-        .catch(er => {
-          console.log(er);
-          elevfnd = true;
-        });
-
-    }
+      .catch(er => {
+        console.log(er);
+      });
+      setTimeout(() => (console.log('Das wird returned: ' + elev)), 1000);
+    //console.log('Das wird returned: ' + elev);
     return elev;
   }
-
 }
 
 

@@ -90,15 +90,16 @@
         FMT_HEIDIS,
     }
     let ready = false;
-    let flightLevels: any[] = [];
+    let flightLevels: any[] = []; 
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
     let forecastDate = '';
-    let elevation: number = 300;
+    let elevation: number;
+    let position: LatLon | undefined = undefined;
 
     const { title } = config;
     const { version } = config;
-    const contrail = new UpperWind();
+    const upperwind = new UpperWind();
 
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
@@ -110,30 +111,23 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-        await contrail.handleEvent(_params); // Wait for handleEvent to complete
-        assignAnalysis(contrail);
+        await upperwind.handleEvent(_params); // Wait for handleEvent to complete
+        assignAnalysis(upperwind);
     };
 
     const listener = () => {
         console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
         //Versuch die Werte zu ändern, sobald die Zeit geändert wurde (geht noch nicht!)
-        assignAnalysis(contrail);
+        assignAnalysis(upperwind);
     };
-    let position: LatLon | undefined = undefined;
+    
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
         singleclick.on('windy-plugin-upper-winds', async ev => {
             position = { lat: ev.lat, lon: ev.lon };
-            await contrail.handleEvent(ev); // Wait for handleEvent to complete
-            assignAnalysis(contrail);
-
-            /** Pick up elevation of the choosen spot*/
-            elevation = Utility.getElevation(position.lat, position.lon);
-            //setTimeout(() => (elevation = Utility.getElevation(position.lat, position.lon)), 10000);
-            console.log('Position'+position.lat + position.lon);
-            setTimeout(() => (elevation = Utility.getElevation(position.lat, position.lon)), 10000);
-            console.log('elevation'+elevation);
+            await upperwind.handleEvent(ev); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
 
             /* Create a Popup to show the clicked position*/
             popup
@@ -145,9 +139,9 @@
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
             if (position === undefined) return;
-            contrail.setTime(windyStore.get('timestamp'));
-            await contrail.handleEvent(position); // Wait for handleEvent to complete
-            assignAnalysis(contrail);
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(position); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
         });
     });
 
@@ -156,9 +150,9 @@
     });
 
     /* Assigns the Analysis to a location and a model*/
-    function assignAnalysis(contrail: UpperWind) {
-        clickLocation = contrail.clickLocation;
-        flightLevels = contrail.flightLevels;
+    function assignAnalysis(upperwind: UpperWind) {
+        clickLocation = upperwind.clickLocation;
+        flightLevels = upperwind.flightLevels;
         filteredFlightLevels = flightLevels.filter(
             level => level.temperature <= level.applemanTemp,
         );
@@ -167,7 +161,14 @@
             'Forecast for ' +
             new Date(windyStore.get('timestamp')) +
             ' using model ' +
-            contrail.model;
+            upperwind.model;
+
+        /** Pick up elevation of the choosen spot */
+        /** elevation = Utility.getElevation(position.lat, position.lon);
+            //setTimeout(() => (elevation = Utility.getElevation(position.lat, position.lon)), 10000);
+            console.log('Position'+position.lat + position.lon);
+            console.log('elevation'+elevation);*/
+
         ready = true;
     }
 
