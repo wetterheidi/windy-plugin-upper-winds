@@ -132,7 +132,7 @@ export class UpperWind {
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
                 //Then calculate wind direction and speed using Utility class
                 const windDir = +(Utility.windDirection(wind_u, wind_v)).toFixed(this._forecastColumn); // Calculate wind direction
-                const windSp = +(Utility.windSpeed(wind_u, wind_v)* 3.6 / 1.852).toFixed(this._forecastColumn); // Calculate wind speed and convert to kt
+                const windSp = +(Utility.windSpeed(wind_u, wind_v)* 3.6 / 1.852).toFixed(0); // Calculate wind speed and convert to kt
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
@@ -171,8 +171,8 @@ export class UpperWind {
         const step = 1000;
 
         //Do not interpolate below 10 feet, set endHeight to 1 instead of 0 to avoid a "NaN" for the lowest pressure value
-        if (endHeight < 1000) {
-            endHeight = 1;
+        if (endHeight < 0) {
+            endHeight = 0;
         }
 
         let previousHuman = '';

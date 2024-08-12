@@ -6,7 +6,7 @@ export class Utility {
   }
 
   static locationDetails(locationObject: LocationDetails): string {
-    console.log("locationObject:", locationObject)
+    console.log("locationObject:", locationObject);
     // Destructure the needed properties from the object
     const { name, region, lat, lon, nameValid } = locationObject;
 

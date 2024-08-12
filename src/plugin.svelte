@@ -90,7 +90,7 @@
         FMT_HEIDIS,
     }
     let ready = false;
-    let flightLevels: any[] = []; 
+    let flightLevels: any[] = [];
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
     let forecastDate = '';
@@ -120,7 +120,6 @@
         //Versuch die Werte zu ändern, sobald die Zeit geändert wurde (geht noch nicht!)
         assignAnalysis(upperwind);
     };
-    
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
@@ -158,10 +157,12 @@
         );
 
         forecastDate =
-            'Forecast for ' +
-            new Date(windyStore.get('timestamp')) +
+            'Forecast for: ' +
+            new Date(windyStore.get('timestamp')) +  
             ' using model ' +
             upperwind.model;
+
+            console.log('Modell: ' + upperwind.model);
 
         /** Pick up elevation of the choosen spot */
         /** elevation = Utility.getElevation(position.lat, position.lon);
