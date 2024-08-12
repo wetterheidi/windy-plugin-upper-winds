@@ -1,6 +1,25 @@
 import { LocationDetails } from './Locationdetails.interface';
 
 export class Utility {
+
+  static async getElevation(lat: number, lon: number): Promise<number> {
+    let elev: number;
+
+    await fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
+      method: 'GET',
+    })
+      .then(r => r.json())
+      .then(r => {
+        elev = Math.round(r[0] * 3.28084);
+        console.log('Feet: ' + elev);
+        return elev;
+      })
+      .catch(er => {
+        console.log(er);
+      });
+    return NaN;
+  }
+
   static linearInterpolation(y1: number, y2: number, ratio: number): number {
     return Math.round(y1 + (y2 - y1) * ratio);
   }
@@ -49,35 +68,6 @@ export class Utility {
       ddd = 36;
     }
     return ddd;
-  }
-
-  static getElevation(lat: number, lon: number): number {
-    /** Pick up elevation data */
-    //elevPntFcst = wxdata.data.header.elevation;
-    let elev: number = 12345;
-    let elevRaw: number;
-    console.log('An getElevation übergebene Position: ' + lat + lon);
-    fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
-      method: 'GET',
-    })
-      .then(r => r.json())
-      .then(r => {
-        elevRaw = r[0];
-        console.log('Raw: ' + elevRaw);
-        //setTimeout(() => (elevfnd = true), 100);
-        elev = Math.round(elevRaw * 3.28084);
-        console.log('Feet: ' + elev);
-        if (elev < 0) {
-          console.log('in der if schleife, die die elevation auf 0 setzt');
-          elev = 0;
-        }
-      })
-      .catch(er => {
-        console.log(er);
-      });
-      setTimeout(() => (console.log('Das wird returned: ' + elev)), 1000);
-    //console.log('Das wird returned: ' + elev);
-    return elev;
   }
 }
 
