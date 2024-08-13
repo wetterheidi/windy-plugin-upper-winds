@@ -71,7 +71,7 @@ export class UpperWind {
             const locationObject = await reverseName.get({ lat: ev.lat, lon: ev.lon }); // Retrieve the location data
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
-            this._elevation = Utility.getElevation(ev.lat, ev.lon); // Get elevation data
+            this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;

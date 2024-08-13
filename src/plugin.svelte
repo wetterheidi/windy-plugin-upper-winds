@@ -157,12 +157,12 @@
         );
 
         forecastDate =
-            'Forecast for: ' + 
-            new Date(windyStore.get('timestamp')) +  
-            ' using model ' + 
+            'Forecast for: ' +
+            new Date(windyStore.get('timestamp')) +
+            ' using model ' +
             upperwind.model;
 
-            console.log('Modell: ' + upperwind.model);
+        console.log('Modell: ' + upperwind.model);
 
         /** Pick up elevation of the choosen spot */
         /** elevation = Utility.getElevation(position.lat, position.lon);
