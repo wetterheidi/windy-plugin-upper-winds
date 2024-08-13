@@ -157,9 +157,9 @@
         );
 
         forecastDate =
-            'Forecast for: ' +
+            'Forecast for: ' + 
             new Date(windyStore.get('timestamp')) +  
-            ' using model ' +
+            ' using model ' + 
             upperwind.model;
 
             console.log('Modell: ' + upperwind.model);

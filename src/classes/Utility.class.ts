@@ -53,9 +53,13 @@ export class Utility {
 
   static getElevation(lat: number, lon: number): number {
     /** Pick up elevation data */
-    //elevPntFcst = wxdata.data.header.elevation;
     let elev: number = 12345;
     let elevRaw: number;
+    /** elevPntFcst = wxdata.data.header.elevation;
+        
+    elev = Math.round(elp.elev * 3.28084);
+    if (elev < 0) elev = 0; */
+    
     console.log('An getElevation übergebene Position: ' + lat + lon);
     fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
       method: 'GET',
