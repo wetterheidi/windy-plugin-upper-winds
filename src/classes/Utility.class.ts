@@ -16,8 +16,8 @@ export class Utility {
       })
       .catch(er => {
         console.log(er);
+        return NaN;
       });
-    return NaN;
   }
 
   static linearInterpolation(y1: number, y2: number, ratio: number): number {
