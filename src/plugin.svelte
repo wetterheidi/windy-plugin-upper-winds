@@ -12,20 +12,21 @@
     {#if !ready}
         <h4>Click on map to generate an upper wind table</h4>
     {:else}
-        <h4>{clickLocation}</h4>
+        <h4><strong>Location: </strong><br />
+            {clickLocation}</h4>
         <h4>
-            Forecast for: <br />
-            {forecastDate}
+            <strong>Forecast time: </strong><br />
+            {forecastDateString}
         </h4>
         <h4>
-            Using forecast model: <br />
+            <strong>Forecast model: </strong><br />
             {forecastModel}
         </h4>
         <h4>
-            Elevation: {elevation} 
+            <strong>Elevation:</strong> {elevation}
         </h4>
         <hr />
-        <h4>Upper winds, temperature and humidity</h4>
+        <h4> <strong>Upper winds, temperature and humidity</strong></h4>
         <div class="weather-stats">
             <table>
                 <thead>
@@ -91,7 +92,6 @@
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
-    import { Utility } from './classes/Utility.class';
 
     enum Format {
         FMT_CSV = 1,
@@ -102,9 +102,10 @@
     let flightLevels: any[] = [];
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
-    let forecastDate = '';
+    let forecastDate: any = '';
+    let forecastDateString: string = '';
     let forecastModel = '';
-    let elevation: number;
+    let elevation: any;
     let position: LatLon | undefined = undefined;
 
     const { title } = config;
@@ -166,9 +167,16 @@
             level => level.temperature <= level.applemanTemp,
         );
 
-        forecastDate = new Date(windyStore.get('timestamp')) + '';
+        forecastDate = new Date(windyStore.get('timestamp'));
+        //Format the Date to ICAO Standards
+        let year = forecastDate.getFullYear();
+        let month = forecastDate.getMonth() + 1;
+        let day = forecastDate.getDate();
+        let hours = forecastDate.getHours();
+        forecastDateString = year + '-' + month + '-' + day + ' ' + hours + ':00 loc ';
         forecastModel = upperwind.model;
-        elevation = (upperwind.elevation * 3.28084).toFixed(0) +' ft/ ' + upperwind.elevation + ' m';
+        elevation =
+            (upperwind.elevation * 3.28084).toFixed(0) + ' ft/ ' + upperwind.elevation + ' m';
         ready = true;
     }
 

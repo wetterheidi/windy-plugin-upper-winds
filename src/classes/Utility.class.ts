@@ -53,6 +53,8 @@ export class Utility {
   }
 
   static async getElevation(lat: number, lon: number): Promise<number> {
+    // Fetch terrain elevation according to 
+    //https://chatgpt.com/share/141edd4b-8987-444f-8cb8-e7f5cbb0f001
     const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`);
     const data = await response.json();
     return data.results[0].elevation;
