@@ -22,7 +22,7 @@
             {forecastModel}
         </h4>
         <h4>
-            Elevation: {elevation} ft
+            Elevation: {elevation} 
         </h4>
         <hr />
         <h4>Upper winds, temperature and humidity</h4>
@@ -168,7 +168,7 @@
 
         forecastDate = new Date(windyStore.get('timestamp')) + '';
         forecastModel = upperwind.model;
-        elevation = upperwind.elevation;
+        elevation = (upperwind.elevation * 3.28084).toFixed(0) +' ft/ ' + upperwind.elevation + ' m';
         ready = true;
     }
 

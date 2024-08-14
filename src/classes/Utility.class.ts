@@ -53,25 +53,11 @@ export class Utility {
   }
 
   static async getElevation(lat: number, lon: number): Promise<number> {
-    let elev: number;
-
-    await fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
-      method: 'GET',
-    })
-      .then(r => r.json())
-      .then(r => {
-        elev = Math.round(r[0] * 3.28084);
-        /** set elevation to 0 over sea surface */
-        if (elev < 0) {elev = 0;}
-        console.log('Feet: ' + elev);
-        return elev;
-      })
-      .catch(er => {
-        console.log(er);
-        return NaN;
-      });
+    const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`);
+    const data = await response.json();
+    return data.results[0].elevation;
   }
-
+  
 }
 
 
