@@ -76,6 +76,7 @@ export class UpperWind {
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
+            console.log('im Handler: ' + this._elevation);
         } catch (error) {
             console.error('* * * An error occurred:', error);
         }

@@ -2,24 +2,6 @@ import { LocationDetails } from './Locationdetails.interface';
 
 export class Utility {
 
-  static async getElevation(lat: number, lon: number): Promise<number> {
-    let elev: number;
-
-    await fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
-      method: 'GET',
-    })
-      .then(r => r.json())
-      .then(r => {
-        elev = Math.round(r[0] * 3.28084);
-        console.log('Feet: ' + elev);
-        return elev;
-      })
-      .catch(er => {
-        console.log(er);
-        return NaN;
-      });
-  }
-
   static linearInterpolation(y1: number, y2: number, ratio: number): number {
     return Math.round(y1 + (y2 - y1) * ratio);
   }
@@ -69,6 +51,27 @@ export class Utility {
     }
     return ddd;
   }
+
+  static async getElevation(lat: number, lon: number): Promise<number> {
+    let elev: number;
+
+    await fetch(`https://www.flymap.co.za/srtm30/elev.php?lat=${lat}&lng=${lon}`, {
+      method: 'GET',
+    })
+      .then(r => r.json())
+      .then(r => {
+        elev = Math.round(r[0] * 3.28084);
+        /** set elevation to 0 over sea surface */
+        if (elev < 0) {elev = 0;}
+        console.log('Feet: ' + elev);
+        return elev;
+      })
+      .catch(er => {
+        console.log(er);
+        return NaN;
+      });
+  }
+
 }
 
 

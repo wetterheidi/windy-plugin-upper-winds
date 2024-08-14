@@ -13,8 +13,17 @@
         <h4>Click on map to generate an upper wind table</h4>
     {:else}
         <h4>{clickLocation}</h4>
-        <h4>{forecastDate}</h4>
-        <h4>Elevation: {elevation} ft</h4>
+        <h4>
+            Forecast for: <br />
+            {forecastDate}
+        </h4>
+        <h4>
+            Using forecast model: <br />
+            {forecastModel}
+        </h4>
+        <h4>
+            Elevation: {elevation} ft
+        </h4>
         <hr />
         <h4>Upper winds, temperature and humidity</h4>
         <div class="weather-stats">
@@ -94,6 +103,7 @@
     let clickLocation = '';
     let filteredFlightLevels: any[] = [];
     let forecastDate = '';
+    let forecastModel = '';
     let elevation: number;
     let position: LatLon | undefined = undefined;
 
@@ -156,20 +166,9 @@
             level => level.temperature <= level.applemanTemp,
         );
 
-        forecastDate =
-            'Forecast for: ' +
-            new Date(windyStore.get('timestamp')) +
-            ' using model ' +
-            upperwind.model;
-
-        console.log('Modell: ' + upperwind.model);
-
-        /** Pick up elevation of the choosen spot */
-        /** elevation = Utility.getElevation(position.lat, position.lon);
-            //setTimeout(() => (elevation = Utility.getElevation(position.lat, position.lon)), 10000);
-            console.log('Position'+position.lat + position.lon);
-            console.log('elevation'+elevation);*/
-
+        forecastDate = new Date(windyStore.get('timestamp')) + '';
+        forecastModel = upperwind.model;
+        elevation = upperwind.elevation;
         ready = true;
     }
 
