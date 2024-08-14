@@ -5,6 +5,7 @@ export interface Sounding {
     windDir: number;        // Wind direction
     windSp: number;         // Wind speed
     height: number;         // Height in feet
+    heightAGL: number;      // Height above ground in feet
     temperature: number;    // Temperature in celsius
     humidityWater: number;  // Relative humidity with respect to water (RHw)
     dewPointt: number;      // Dewpoint temperature

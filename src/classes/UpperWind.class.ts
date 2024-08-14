@@ -76,7 +76,6 @@ export class UpperWind {
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
-            console.log('im Handler: ' + this._elevation);
         } catch (error) {
             console.error('* * * An error occurred:', error);
         }
@@ -128,6 +127,7 @@ export class UpperWind {
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
+                const heightAGL = +((heightInMeters - this.elevation) * 3.28084).toFixed(this._forecastColumn); // Convert to feet
                 //First get u and v component of wind
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
@@ -143,6 +143,7 @@ export class UpperWind {
                 this._rawdata.push({
                     pressure,
                     height,
+                    heightAGL,
                     temperature,
                     humidityWater,
                     wind_u,
@@ -218,6 +219,12 @@ export class UpperWind {
             ratio,
         );
 
+        const heightAGL = Utility.linearInterpolation(
+            upper.heightAGL,
+            lower.heightAGL,
+            ratio,
+        );
+
         const temperature = Utility.linearInterpolation(
             upper.temperature,
             lower.temperature,
@@ -256,6 +263,7 @@ export class UpperWind {
 
         const interpolated: Sounding = {
             height: targetHeight,
+            heightAGL: heightAGL,
             pressure: pressure,
             temperature: temperature,
             humidityWater: humidityWater,
