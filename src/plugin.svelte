@@ -40,7 +40,7 @@
                         <th>RHw</th>
                     </tr>
                     <tr>
-                        <th>ft</th>
+                        <th>ft AMSL</th>
                         <th>°</th>
                         <th>kt</th>
                         <th>hPa</th>

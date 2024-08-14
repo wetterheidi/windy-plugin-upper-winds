@@ -28,14 +28,14 @@ export class UpperWind {
     /** Forecast timestamp */
     private _timestamp: number = Date.now();
     /** Terrain elevation */
-    private _elevation= 0;
+    private _elevation = 0;
 
     setTime(t: number) {
         this._timestamp = t;
     }
 
     get getTime() {
-        return  this._timestamp;
+        return this._timestamp;
     }
 
     /** Return the final elevation */
@@ -82,7 +82,7 @@ export class UpperWind {
         }
     }
 
-  private  findNearestColumn(epoch: number[]) {
+    private findNearestColumn(epoch: number[]) {
 
         let closestIndex = -1;
         let closestDiff = Infinity;
@@ -129,16 +129,16 @@ export class UpperWind {
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
                 //First get u and v component of wind
-                const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
-                const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0); 
+                const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
+                const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 //Then calculate wind direction and speed using Utility class
                 const windDir = +(Utility.windDirection(wind_u, wind_v)).toFixed(this._forecastColumn); // Calculate wind direction
-                const windSp = +(Utility.windSpeed(wind_u, wind_v)* 3.6 / 1.852).toFixed(0); // Calculate wind speed and convert to kt
+                const windSp = +(Utility.windSpeed(wind_u, wind_v) * 3.6 / 1.852).toFixed(0); // Calculate wind speed and convert to kt
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
-                
-               
+
+
 
                 this._rawdata.push({
                     pressure,
@@ -152,7 +152,7 @@ export class UpperWind {
                     dewPointt,
                     human,
                 });
-            
+
             }
         }
         // Sorting the array by height in descending order
@@ -171,9 +171,9 @@ export class UpperWind {
         let endHeight = Math.floor(data[data.length - 1].height / 1000) * 1000; // Lowest point, rounded down to nearest 1000
         const step = 1000;
 
-        //Do not interpolate below 10 feet, set endHeight to 1 instead of 0 to avoid a "NaN" for the lowest pressure value
-        if (endHeight < 0) {
-            endHeight = 0;
+        //Do not interpolate below terrain elevation to avoid irrealistic values
+        if (endHeight < this.elevation * 3.28084) {
+            endHeight = this.elevation * 3.28084;
         }
 
         let previousHuman = '';
@@ -191,7 +191,7 @@ export class UpperWind {
                 const upper = data[upperBoundIndex];
                 const lower = data[upperBoundIndex - 1];
 
-                const currentLayer = this.interpolate(lower, upper, height,previousHuman);
+                const currentLayer = this.interpolate(lower, upper, height, previousHuman);
                 previousHuman = currentLayer.human;
                 result.push(currentLayer);
             }
