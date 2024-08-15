@@ -12,8 +12,10 @@
     {#if !ready}
         <h4>Click on map to generate an upper wind table</h4>
     {:else}
-        <h4><strong>Location: </strong><br />
-            {clickLocation}</h4>
+        <h4>
+            <strong>Location: </strong><br />
+            {clickLocation}
+        </h4>
         <h4>
             <strong>Forecast time: </strong><br />
             {forecastDateString}
@@ -23,14 +25,16 @@
             {forecastModel}
         </h4>
         <h4>
-            <strong>Elevation:</strong> {elevation}
+            <strong>Elevation:</strong>
+            {elevation}
         </h4>
         <hr />
-        <h4> <strong>Upper winds, temperature and humidity</strong></h4>
+        <h4><strong>Upper winds, temperature and humidity</strong></h4>
         <div class="weather-stats">
             <table>
                 <thead>
                     <tr>
+                        <th>h</th>
                         <th>h</th>
                         <th>Dir</th>
                         <th>Speed</th>
@@ -41,6 +45,7 @@
                     </tr>
                     <tr>
                         <th>ft AMSL</th>
+                        <th>ft <br />AGL</th>
                         <th>°</th>
                         <th>kt</th>
                         <th>hPa</th>
@@ -50,13 +55,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each flightLevels as { height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
+                    {#each flightLevels as { height, heightAGL, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
                         <tr
                             class:green-text={temperature > -0.5 && temperature < 0.5}
                             class:blue-text={temperature <= -0.5}
                             class:red-text={temperature >= 0.5}
                         >
                             <td>{height}</td>
+                            <td>{heightAGL}</td>
                             <td>{windDir}0</td>
                             <td>{windSp}</td>
                             <td>{pressure}</td>
@@ -70,12 +76,32 @@
         </div>
         <hr />
         <div style="text-align:center">
-            {#if forecastModel !== 'ECMWF-HRES'}
-            <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
-            <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
-            <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
-            {/if}
+                <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
+                <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
+                <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
         </div>
+        <hr>
+
+        <div>
+            <h4>
+                <strong>Settings (not operable yet): </strong><br />
+                <h4>
+                    Height:  
+                <select >
+                        <option>Meter</option> 
+                        <option>Feet</option> 
+                </select>
+                <h4>
+                    Increment:  
+                <select >
+                        <option>100</option> 
+                        <option>200</option> 
+                        <option>500</option>
+                        <option>1000</option>
+                </select>
+            </h4>
+        </div>
+       
     {/if}
     <hr />
 </section>
@@ -219,7 +245,7 @@
             // which keys to extract into columns, by field order
             const sequence = [
                 'pressure',
-                'height',
+                'heightAGL',
                 'temperature',
                 'dewPointt',
                 'wind_u',

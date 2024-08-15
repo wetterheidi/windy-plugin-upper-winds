@@ -127,7 +127,7 @@ export class UpperWind {
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
-                const heightAGL = +((heightInMeters - this.elevation) * 3.28084).toFixed(this._forecastColumn); // Convert to feet
+                const heightAGL = +((heightInMeters - this.elevation) * 3.28084).toFixed(this._forecastColumn); // Convert to AGL
                 //First get u and v component of wind
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
@@ -153,7 +153,6 @@ export class UpperWind {
                     dewPointt,
                     human,
                 });
-
             }
         }
         // Sorting the array by height in descending order
@@ -169,8 +168,10 @@ export class UpperWind {
         const result = [];
         // Define the range of heights for interpolation
         const startHeight = Math.floor(data[0].height / 1000) * 1000; // Highest point, rounded down to nearest 1000
+        console.log(startHeight);
         let endHeight = Math.floor(data[data.length - 1].height / 1000) * 1000; // Lowest point, rounded down to nearest 1000
-        const step = 1000;
+
+        let step: number;
 
         //Do not interpolate below terrain elevation to avoid irrealistic values
         if (endHeight < this.elevation * 3.28084) {
@@ -179,6 +180,13 @@ export class UpperWind {
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {
+            // Flexible steps depending on height
+            if (height > 10000) {
+                step = 1000;
+            } else {
+                step = 500;
+            }
+
             // Find the nearest data points around the current height
             const upperBoundIndex = data.findIndex(d => d.height <= height);
             if (upperBoundIndex === -1) {
