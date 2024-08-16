@@ -126,7 +126,7 @@ export class UpperWind {
 
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
-                const height = +(heightInMeters * 3.28084).toFixed(this._forecastColumn); // Convert to feet
+                const height = +(heightInMeters * 3.28084).toFixed(0); // Convert to feet
                 const heightAGL = +((heightInMeters - this.elevation) * 3.28084).toFixed(this._forecastColumn); // Convert to AGL
                 //First get u and v component of wind
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
@@ -167,16 +167,13 @@ export class UpperWind {
     private stratify(data: Sounding[]) {
         const result = [];
         // Define the range of heights for interpolation
-        const startHeight = Math.floor(data[0].height / 1000) * 1000; // Highest point, rounded down to nearest 1000
-        console.log(startHeight);
-        let endHeight = Math.floor(data[data.length - 1].height / 1000) * 1000; // Lowest point, rounded down to nearest 1000
-
+        // Define start height so that AGL is rounded to 1000 ft
+        const startHeight = (Math.floor((data[0].height - this.elevation * 3.28084) / 1000) * 1000 + (this.elevation * 3.28084)); // Highest point (AMSL)
+        
+        const endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 1000) * 1000; // Lowest point above ground level, rounded down to nearest 1000
+        console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * 3.28084);
+        console.log('Ansatz für die Pressure Problematik: ' + data[data.length - 1].pressure);
         let step: number;
-
-        //Do not interpolate below terrain elevation to avoid irrealistic values
-        if (endHeight < this.elevation * 3.28084) {
-            endHeight = this.elevation * 3.28084;
-        }
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {
