@@ -170,10 +170,21 @@ export class UpperWind {
         // Define start height so that AGL is rounded to 1000 ft
         const startHeight = (Math.floor((data[0].height - this.elevation * 3.28084) / 1000) * 1000 + (this.elevation * 3.28084)); // Highest point (AMSL)
         // Lowest point above ground level, rounded down to nearest 500, substract 500 to find ground level
-        const endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 500) * 500 - 500;
+        let endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 500) * 500 - 500;
         console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * 3.28084);
-        console.log('Ansatz für die Pressure Problematik: ' + data[data.length - 1].pressure);
+        // Avoiding NaN in pressure values greater then 1000 hPa
+        if (isNaN(data[data.length - 1].pressure)) {
+            data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
+            console.log('berechneter Druck: ' + data[data.length - 1].pressure);
+        } else if (isNaN(data[data.length - 2].pressure)) {
+            data[data.length - 2].pressure = data[data.length - 3].pressure + (data[data.length - 3].height / 32);
+            console.log('berechneter Druck: ' + data[data.length - 2].pressure);
+        }
         let step: number;
+
+        if (endHeight < 0) {
+            endHeight = 0;
+        }
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {

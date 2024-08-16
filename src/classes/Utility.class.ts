@@ -60,6 +60,9 @@ export class Utility {
     return data.results[0].elevation;
   }
   
+  static calculatePressure(){
+    
+  }
 }
 
 
