@@ -79,7 +79,13 @@
         </div>
         <hr>
 
-        <div>
+    {/if}
+    <hr />
+</section>
+
+<script lang="ts">
+    /*Vorlage für Settings:
+     <div>
             <h4>
                 <strong>Settings (not operable yet): </strong><br />
                 <h4>
@@ -97,15 +103,7 @@
                         <option>1000</option>
                 </select>
             </h4>
-        </div>
-       
-    {/if}
-    <hr />
-</section>
-
-<script lang="ts">
-    /*Vorlage für Onclick Aktion des Downloadbuttons:
-    <button on:click={downloadData}> Download data </button> */
+        </div> */
 
     import bcast from '@windy/broadcast';
     import { map } from '@windy/map';
