@@ -59,9 +59,16 @@ export class Utility {
     const data = await response.json();
     return data.results[0].elevation;
   }
-  
-  static calculatePressure(){
-    
+
+  static calculatePressure(p: number, h: number): number {
+    // reduce the pressure down to sea level rounded to hole hPa values
+    let qnh: number = 0;
+    const a: number = 287.05 * (0.0065 / 9.80665);
+    const b: number = 0.0065 * (Math.pow(1013.25, a) / 288.15);
+
+    qnh = Math.round(Math.pow((Math.pow(p, a) + b * (h/3.28084)), (1 / a)));
+
+    return qnh;
   }
 }
 

@@ -174,10 +174,11 @@ export class UpperWind {
         console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * 3.28084);
         // Avoiding NaN in pressure values greater then 1000 hPa
         if (isNaN(data[data.length - 1].pressure)) {
-            data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
+            //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
+            data[data.length - 1].pressure = Utility.calculatePressure((data[data.length - 2].pressure), (data[data.length - 2].height));
             console.log('berechneter Druck: ' + data[data.length - 1].pressure);
         } else if (isNaN(data[data.length - 2].pressure)) {
-            data[data.length - 2].pressure = data[data.length - 3].pressure + (data[data.length - 3].height / 32);
+            data[data.length - 2].pressure = Utility.calculatePressure((data[data.length - 3].pressure), (data[data.length - 3].height));
             console.log('berechneter Druck: ' + data[data.length - 2].pressure);
         }
         let step: number;
