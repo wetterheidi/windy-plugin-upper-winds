@@ -60,7 +60,7 @@
                             class:red-text={temperature >= 0.5}
                         >
                             <td>{heightAGL}</td>
-                            <td>{windDir}0</td>
+                            <td>{windDir}</td>
                             <td>{windSp}</td>
                             <td>{pressure}</td>
                             <td>{temperature}</td>

@@ -45,9 +45,11 @@ export class Utility {
       ddd = 90 + (Math.acos(uComponent / ff) * 180) / Math.PI;
     }
     ddd = (ddd + 180) % 360;
-    ddd = Math.round(ddd / 10); //To round to hole tens. "0" is added in plugin.svelte html-Part
+    console.log('Windrichtung ungerundet: ' + ddd);
+    //ddd = Math.round(ddd / 10) * 10; //To round to hole tens. "0" is added in plugin.svelte html-Part
+    console.log('Windrichtung gerundet: ' + ddd);
     if (ddd == 0) {
-      ddd = 36;
+      ddd = 360;
     }
     return ddd;
   }
@@ -66,7 +68,7 @@ export class Utility {
     const a: number = 287.05 * (0.0065 / 9.80665);
     const b: number = 0.0065 * (Math.pow(1013.25, a) / 288.15);
 
-    qnh = Math.round(Math.pow((Math.pow(p, a) + b * (h/3.28084)), (1 / a)));
+    qnh = Math.round(Math.pow((Math.pow(p, a) + b * (h / 3.28084)), (1 / a)));
 
     return qnh;
   }
