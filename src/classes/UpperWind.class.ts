@@ -169,8 +169,8 @@ export class UpperWind {
         // Define the range of heights for interpolation
         // Define start height so that AGL is rounded to 1000 ft
         const startHeight = (Math.floor((data[0].height - this.elevation * 3.28084) / 1000) * 1000 + (this.elevation * 3.28084)); // Highest point (AMSL)
-        
-        const endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 1000) * 1000; // Lowest point above ground level, rounded down to nearest 1000
+        // Lowest point above ground level, rounded down to nearest 500
+        const endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 500) * 500; 
         console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * 3.28084);
         console.log('Ansatz für die Pressure Problematik: ' + data[data.length - 1].pressure);
         let step: number;

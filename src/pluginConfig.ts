@@ -11,6 +11,7 @@ const config: ExternalPluginConfig = {
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
     routerPath: '/upper-winds',
+    desktopWidth: 500,
     listenToSingleclick: true,
     addToContextmenu: true,
     private: true
