@@ -46,7 +46,7 @@ export class Utility {
     }
     ddd = (ddd + 180) % 360;
     //console.log('Windrichtung ungerundet: ' + ddd);
-    //ddd = Math.round(ddd / 10) * 10; //To round to hole tens. "0" is added in plugin.svelte html-Part
+    ddd = Math.round(ddd / 10) * 10; //To round to hole tens. 
     //console.log('Windrichtung gerundet: ' + ddd);
     if (ddd == 0) {
       ddd = 360;
