@@ -6,6 +6,23 @@ export class Utility {
     return Math.round(y1 + (y2 - y1) * ratio);
   }
 
+  static gaussianInterpolation(y1: number, y2: number, h1: number, h2: number, hp: number): number {
+    /** Using a weighted interpolation with simplified truncated gaussian filters according to
+     * https://www.e3s-conferences.org/articles/e3sconf/pdf/2024/06/e3sconf_aisce2023_01057.pdf
+     * y1, h1: values at the upper data point
+     * y2, h2: values at the lower data point
+     * hp: target height 
+     */
+    let w1: number = 0;
+    let w2: number = 0;
+
+    w1 = 1 / Math.abs(h1 - hp);
+    w2 = 1 / Math.abs(h2 - hp);
+
+    const yp: number = (w1 * y1 + w2 * y2) / (w1 + w2);
+    return yp;
+  }
+
   static locationDetails(locationObject: LocationDetails): string {
     console.log("locationObject:", locationObject);
     // Destructure the needed properties from the object

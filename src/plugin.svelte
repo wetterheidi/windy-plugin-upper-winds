@@ -61,7 +61,7 @@
                         >
                             <td>{heightAGL}</td>
                             <td>{windDir}</td>
-                            <td>{windSp}</td>
+                            <td>{Math.round((windSp * 3.6) / 1.852)}</td>
                             <td>{pressure}</td>
                             <td>{temperature}</td>
                             <td>{dewPointt}</td>
@@ -73,12 +73,11 @@
         </div>
         <hr />
         <div style="text-align:center">
-                <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
-                <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
-                <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
+            <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
+            <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
+            <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
         </div>
-        <hr>
-
+        <hr />
     {/if}
     <hr />
 </section>
@@ -180,6 +179,8 @@
 
     onDestroy(() => {
         bcast.off('redrawFinished', listener);
+        //map.removeLayer(popup);
+        activeLayer.clearLayers();
     });
 
     /* Assigns the Analysis to a location and a model*/
@@ -240,6 +241,7 @@
             // which keys to extract into columns, by field order
             const sequence = [
                 'pressure',
+                'height',
                 'heightAGL',
                 'temperature',
                 'dewPointt',

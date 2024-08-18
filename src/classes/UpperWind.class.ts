@@ -133,7 +133,7 @@ export class UpperWind {
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 //Then calculate wind direction and speed using Utility class
                 const windDir = +(Utility.windDirection(wind_u, wind_v)).toFixed(0); // Calculate wind direction
-                const windSp = +(Utility.windSpeed(wind_u, wind_v) * 3.6 / 1.852).toFixed(0); // Calculate wind speed and convert to kt
+                const windSp = +(Utility.windSpeed(wind_u, wind_v)).toFixed(0); // Calculate wind speed
                 const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
@@ -254,16 +254,32 @@ export class UpperWind {
             ratio,
         );
 
-        const wind_u = Utility.linearInterpolation(
+       /* const wind_u = Utility.linearInterpolation(
             upper.wind_u,
             lower.wind_u,
             ratio,
+        );*/
+
+        const wind_u = Utility.gaussianInterpolation(
+            upper.wind_u,
+            lower.wind_u,
+            upper.height,
+            lower.height,
+            targetHeight,
         );
 
-        const wind_v = Utility.linearInterpolation(
+        /* const wind_v = Utility.linearInterpolation(
             upper.wind_v,
             lower.wind_v,
             ratio,
+        ); */
+
+        const wind_v = Utility.gaussianInterpolation(
+            upper.wind_v,
+            lower.wind_v,
+            upper.height,
+            lower.height,
+            targetHeight,
         );
 
         /** calculate wind direction and wind speed from u and v component, to obtain correct 
