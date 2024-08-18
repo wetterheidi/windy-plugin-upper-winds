@@ -72,12 +72,37 @@
             </table>
         </div>
         <hr />
+        <div>
+            <h4>
+                <strong>Settings (not operable yet): </strong><br />
+                <h4>
+                    Height:
+                    <select>
+                        <option>Feet</option>
+                        <option>Meter</option>
+                    </select>
+                    <h4>
+                        Increment:
+                        <select
+                            bind:value={selected}
+                            on:change={() => console.log('Geändert: ')}
+                        >
+                            {#each increments as increment}
+                                <option value={increment}>
+                                    {increment.text}
+                                </option>
+                            {/each}
+                        </select>
+                    </h4>
+                </h4>
+            </h4>
+        </div>
+        <hr />
         <div style="text-align:center">
             <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
             <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
             <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
         </div>
-        <hr />
     {/if}
     <hr />
 </section>
@@ -134,6 +159,17 @@
     const { version } = config;
     const upperwind = new UpperWind();
 
+    /* Prepare dropdown list for setting the height increment */
+    let increments = [
+        { id: 1, text: `100` },
+        { id: 2, text: `200` },
+        { id: 3, text: `500` },
+        { id: 4, text: `1000` },
+        { id: 4, text: `2000` }
+    ];
+
+    let selected: any;
+
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
@@ -144,8 +180,19 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-        await upperwind.handleEvent(_params); // Wait for handleEvent to complete
-        assignAnalysis(upperwind);
+
+        singleclick.on('windy-plugin-upper-winds', async ev => {
+            position = { lat: ev.lat, lon: ev.lon };
+            await upperwind.handleEvent(ev); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+
+            /* Create a Popup to show the clicked position*/
+            popup
+                .setLatLng([position.lat, position.lon])
+                .setContent(clickLocation)
+                .addTo(activeLayer)
+                .openOn(map);
+        });
     };
 
     const listener = () => {
@@ -179,8 +226,7 @@
 
     onDestroy(() => {
         bcast.off('redrawFinished', listener);
-        //map.removeLayer(popup);
-        activeLayer.clearLayers();
+        popup.remove();
     });
 
     /* Assigns the Analysis to a location and a model*/

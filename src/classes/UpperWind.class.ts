@@ -8,9 +8,6 @@ import {
 import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
 
-
-
-
 export class UpperWind {
 
     /** The raw data from Windy - arranged by pressure */
@@ -29,6 +26,9 @@ export class UpperWind {
     private _timestamp: number = Date.now();
     /** Terrain elevation */
     private _elevation = 0;
+    /** Step (i.e. height increment to interpolate) */
+    private _step = 0;
+
 
     setTime(t: number) {
         this._timestamp = t;
@@ -41,6 +41,11 @@ export class UpperWind {
     /** Return the final elevation */
     get elevation() {
         return this._elevation;
+    }
+
+    /** Return step */
+    get step() {
+        return this._step;
     }
 
     /** Return the final data */
@@ -72,6 +77,7 @@ export class UpperWind {
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
             this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data
+            this._step = 1000; // set height increment to interpolate
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
@@ -181,7 +187,9 @@ export class UpperWind {
             data[data.length - 2].pressure = Utility.calculatePressure((data[data.length - 3].pressure), (data[data.length - 3].height));
             console.log('berechneter Druck: ' + data[data.length - 2].pressure);
         }
-        let step: number;
+
+        const step = this._step;
+        //const step: number = 1000;
 
         if (endHeight < 0) {
             endHeight = 0;
@@ -189,12 +197,12 @@ export class UpperWind {
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {
-            // Flexible steps depending on height
+            /* Flexible steps depending on height
             if (height > 10000) {
                 step = 1000;
             } else {
                 step = 500;
-            }
+            }*/
 
             // Find the nearest data points around the current height
             const upperBoundIndex = data.findIndex(d => d.height <= height);
@@ -254,11 +262,11 @@ export class UpperWind {
             ratio,
         );
 
-       /* const wind_u = Utility.linearInterpolation(
-            upper.wind_u,
-            lower.wind_u,
-            ratio,
-        );*/
+        /* const wind_u = Utility.linearInterpolation(
+             upper.wind_u,
+             lower.wind_u,
+             ratio,
+         );*/
 
         const wind_u = Utility.gaussianInterpolation(
             upper.wind_u,
@@ -285,8 +293,8 @@ export class UpperWind {
         /** calculate wind direction and wind speed from u and v component, to obtain correct 
          * interpolated values (as wind is a vector)
          */
-        const windDir = Math.round(Utility.windDirection(wind_u,wind_v));
-        const windSp = Math.round(Utility.windSpeed(wind_u,wind_v));
+        const windDir = Math.round(Utility.windDirection(wind_u, wind_v));
+        const windSp = Math.round(Utility.windSpeed(wind_u, wind_v));
 
 
         const interpolated: Sounding = {
