@@ -180,19 +180,17 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-
-        singleclick.on('windy-plugin-upper-winds', async ev => {
-            position = { lat: ev.lat, lon: ev.lon };
-            await upperwind.handleEvent(ev); // Wait for handleEvent to complete
-            assignAnalysis(upperwind);
-
-            /* Create a Popup to show the clicked position*/
-            popup
-                .setLatLng([position.lat, position.lon])
-                .setContent(clickLocation)
-                .addTo(activeLayer)
-                .openOn(map);
-        });
+        
+        popup
+            .setLatLng([_params.lat, _params.lon])
+            .setContent('Loading....')
+            .addTo(activeLayer)
+            .openOn(map);
+        upperwind.setTime(windyStore.get('timestamp'));
+        await upperwind.handleEvent(_params); // Wait for handleEvent to complete
+        assignAnalysis(upperwind);
+        popup.setContent(clickLocation)
+            
     };
 
     const listener = () => {
