@@ -135,6 +135,8 @@
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
+    import { Utility } from './Utility.class';
+    import metrics from '@windy/metrics';
 
     enum Format {
         FMT_CSV = 1,
@@ -232,6 +234,9 @@
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
+
+        console.log('----->metrics Test: ' + metrics.wind.convertNumber(234.9));
+        console.log('----->metrics Test: ' + metrics.wind.convertValue(234.9));
     });
 
     onDestroy(() => {

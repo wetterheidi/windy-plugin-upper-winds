@@ -1,4 +1,6 @@
 import { LocationDetails } from './Locationdetails.interface';
+import metrics from '@windy/metrics';
+
 
 export class Utility {
 
@@ -90,4 +92,51 @@ export class Utility {
     return qnh;
   }
 
+  static findOutTemperatureUnit(temperature: number): string {
+    // find out the unit from user settings
+    let unitTemperature: string = '';
+    const temperatureString: string = metrics.temp.convertValue(temperature);
+    if (temperatureString.match('°C')) {
+      unitTemperature = '°C';
+    } else if (temperatureString.match('°F')) {
+      unitTemperature = '°F';
+    }
+    console.log('Umgewandelte temperatur ' + temperatureString);
+    console.log('------> Temperatureinheit rausgefischt?: ' + unitTemperature);
+    return unitTemperature;
+  }
+
+  static findOutWindUnit(wind: number): string {
+    // find out the unit from user settings
+    let unitWind: string = '';
+    const windString: string = metrics.wind.convertValue(wind);
+    if (windString.match('kt')) {
+      unitWind = 'kt';
+    } else if (windString.match('bft')) {
+      unitWind = 'bft';
+    } else if (windString.match('m/s')) {
+      unitWind = 'm/s';
+    } else if (windString.match('km/h')) {
+      unitWind = 'km/h';
+    } else if (windString.match('mph')) {
+      unitWind = 'mph';
+    }
+    console.log('Umgewandelte Wind ' + windString);
+    console.log('------> Windeinheit rausgefischt?: ' + unitWind);
+    return unitWind;
+  }
+
+  static findOutAltitudeUnit(altitude: number): string {
+    // find out the unit from user settings
+    let unitALtitude: string = '';
+    const altitudeString: string = metrics.altitude.convertValue(altitude);
+    if (altitudeString.match('m')) {
+      unitALtitude = 'm';
+    } else if (altitudeString.match('ft')) {
+      unitALtitude = 'ft';
+    }
+    console.log('Umgewandelte Höhe ' + altitudeString);
+    console.log('------> Höheneinheit rausgefischt?: ' + unitALtitude);
+    return unitALtitude;
+  }
 }

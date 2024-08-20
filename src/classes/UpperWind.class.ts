@@ -5,8 +5,10 @@ import {
     MeteogramDataPayload,
     MeteogramDataHash,
 } from '@windycom/plugin-devtools/types/interfaces';
+import metrics from '@windy/metrics';
 import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
+
 
 export class UpperWind {
 
@@ -145,7 +147,6 @@ export class UpperWind {
                 const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
 
 
-
                 this._rawdata.push({
                     pressure,
                     height,
@@ -222,6 +223,10 @@ export class UpperWind {
                 result.push(currentLayer);
             }
         }
+
+        console.log('Versuch: ' +  Utility.findOutTemperatureUnit(273.15)); //Kelvin in raw data
+        console.log('Versuch: ' +  Utility.findOutWindUnit(10)); // m/s in raw data
+        console.log('Versuch: ' +  Utility.findOutAltitudeUnit(100)); // m in raw data
 
         return result;
     }
@@ -312,5 +317,9 @@ export class UpperWind {
         };
 
         return interpolated;
+    }
+
+    private units(){
+        
     }
 }
