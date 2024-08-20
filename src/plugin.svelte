@@ -61,7 +61,7 @@
                         >
                             <td>{heightAGL}</td>
                             <td>{windDir}</td>
-                            <td>{windSp}</td>
+                            <td>{Math.round((windSp * 3.6) / 1.852)}</td>
                             <td>{pressure}</td>
                             <td>{temperature}</td>
                             <td>{dewPointt}</td>
@@ -71,32 +71,54 @@
                 </tbody>
             </table>
         </div>
+        <hr />
+        <div>
+            <h4>
+                <strong>Settings (not operable yet): </strong><br />
+                <h4>
+                    <h4>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Height:     </label>
+                            <select bind:value={settings.heightUnit} class="from-select">
+                                <option value="" disabled>-- Select Unit --</option>
+                                {#each heightUnitquestions as heightUnitquestion}
+                                    <option value={heightUnitquestion.text}>{heightUnitquestion.text}</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Increment: </label>
+                            <select bind:value={settings.increment} class="from-select">
+                                <option value="" disabled>-- Select Increment --</option>
+                                {#each incrementquestions as incrementquestion}
+                                    <option value={incrementquestion.text}>{incrementquestion.text}</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Wind:     </label>
+                            <select bind:value={settings.windUnit} class="from-select">
+                                <option value="" disabled>-- Select Unit --</option>
+                                {#each windUnitquestions as windUnitquestion}
+                                    <option value={windUnitquestion.text}>{windUnitquestion.text}</option>
+                                {/each}
+                            </select>
+                        </div>
+                    </h4>
+                </h4>
+            </h4>
+        </div>
+        <hr />
+        <div style="text-align:center">
+            <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
+            <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
+            <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
+        </div>
     {/if}
     <hr />
 </section>
 
 <script lang="ts">
-    /*Vorlage für Settings:
-     <div>
-            <h4>
-                <strong>Settings (not operable yet): </strong><br />
-                <h4>
-                    Height:  
-                <select >
-                        <option>Meter</option> 
-                        <option>Feet</option> 
-                </select>
-                <h4>
-                    Increment:  
-                <select >
-                        <option>100</option> 
-                        <option>200</option> 
-                        <option>500</option>
-                        <option>1000</option>
-                </select>
-            </h4>
-        </div> */
-
     import bcast from '@windy/broadcast';
     import { map } from '@windy/map';
     import { onDestroy, onMount } from 'svelte';
@@ -120,6 +142,24 @@
     const { version } = config;
     const upperwind = new UpperWind();
 
+    /* Prepare dropdown list for settings*/
+    let settings = {
+        heightUnit: 'Feet',
+        increment: '1000',
+        windUnit: 'kt',
+    };
+
+    let incrementquestions = [{ text: '100' }, { text: '200' }, { text: '500' }, { text: '1000' }, { text: '2000' }];
+    let heightUnitquestions = [{ text: 'Feet' }, { text: 'Meter' }];
+    let windUnitquestions = [{ text: 'kt' }, { text: 'm/s' }];
+
+    //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
+    $: console.log('---->', settings.increment);
+    $: console.log('---->', settings.heightUnit);
+    $: {console.log('---->', settings.windUnit);
+    }
+
+
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
@@ -130,8 +170,16 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
+
+        popup
+            .setLatLng([_params.lat, _params.lon])
+            .setContent('Loading....')
+            .addTo(activeLayer)
+            .openOn(map);
+        upperwind.setTime(windyStore.get('timestamp'));
         await upperwind.handleEvent(_params); // Wait for handleEvent to complete
         assignAnalysis(upperwind);
+        popup.setContent(clickLocation);
     };
 
     const listener = () => {
@@ -165,6 +213,7 @@
 
     onDestroy(() => {
         bcast.off('redrawFinished', listener);
+        popup.remove();
     });
 
     /* Assigns the Analysis to a location and a model*/
