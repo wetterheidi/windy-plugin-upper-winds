@@ -78,11 +78,13 @@
                 <h4>
                     <h4>
                         <div class="mb-3">
-                            <label for="" class="form-label">Height:     </label>
+                            <label for="" class="form-label">Height: </label>
                             <select bind:value={settings.heightUnit} class="from-select">
                                 <option value="" disabled>-- Select Unit --</option>
                                 {#each heightUnitquestions as heightUnitquestion}
-                                    <option value={heightUnitquestion.text}>{heightUnitquestion.text}</option>
+                                    <option value={heightUnitquestion.text}
+                                        >{heightUnitquestion.text}</option
+                                    >
                                 {/each}
                             </select>
                         </div>
@@ -91,16 +93,20 @@
                             <select bind:value={settings.increment} class="from-select">
                                 <option value="" disabled>-- Select Increment --</option>
                                 {#each incrementquestions as incrementquestion}
-                                    <option value={incrementquestion.text}>{incrementquestion.text}</option>
+                                    <option value={incrementquestion.text}
+                                        >{incrementquestion.text}</option
+                                    >
                                 {/each}
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="" class="form-label">Wind:     </label>
+                            <label for="" class="form-label">Wind: </label>
                             <select bind:value={settings.windUnit} class="from-select">
                                 <option value="" disabled>-- Select Unit --</option>
                                 {#each windUnitquestions as windUnitquestion}
-                                    <option value={windUnitquestion.text}>{windUnitquestion.text}</option>
+                                    <option value={windUnitquestion.text}
+                                        >{windUnitquestion.text}</option
+                                    >
                                 {/each}
                             </select>
                         </div>
@@ -156,16 +162,26 @@
         windUnit: 'kt',
     };
 
-    let incrementquestions = [{ text: '100' }, { text: '200' }, { text: '500' }, { text: '1000' }, { text: '2000' }];
+    let incrementquestions = [
+        { text: '100' },
+        { text: '200' },
+        { text: '500' },
+        { text: '1000' },
+        { text: '2000' },
+    ];
     let heightUnitquestions = [{ text: 'Feet' }, { text: 'Meter' }];
     let windUnitquestions = [{ text: 'kt' }, { text: 'm/s' }];
 
     //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
-    $: console.log('---->', settings.increment);
-    $: console.log('---->', settings.heightUnit);
-    $: {console.log('---->', settings.windUnit);
+    $: {
+        console.log('---->', settings.increment);
     }
-
+    $: {
+        console.log('---->', settings.heightUnit);
+    }
+    $: {
+        console.log('---->', settings.windUnit);
+    }
 
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
