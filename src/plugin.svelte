@@ -76,23 +76,34 @@
             <h4>
                 <strong>Settings (not operable yet): </strong><br />
                 <h4>
-                    Height:
-                    <select>
-                        <option>Feet</option>
-                        <option>Meter</option>
-                    </select>
                     <h4>
-                        Increment:
-                        <select
-                            bind:value={selected}
-                            on:change={() => console.log('Geändert: ')}
-                        >
-                            {#each increments as increment}
-                                <option value={increment}>
-                                    {increment.text}
-                                </option>
-                            {/each}
-                        </select>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Height:     </label>
+                            <select bind:value={settings.heightUnit} class="from-select">
+                                <option value="" disabled>-- Select Unit --</option>
+                                {#each heightUnitquestions as heightUnitquestion}
+                                    <option value={heightUnitquestion.text}>{heightUnitquestion.text}</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Increment: </label>
+                            <select bind:value={settings.increment} class="from-select">
+                                <option value="" disabled>-- Select Increment --</option>
+                                {#each incrementquestions as incrementquestion}
+                                    <option value={incrementquestion.text}>{incrementquestion.text}</option>
+                                {/each}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Wind:     </label>
+                            <select bind:value={settings.windUnit} class="from-select">
+                                <option value="" disabled>-- Select Unit --</option>
+                                {#each windUnitquestions as windUnitquestion}
+                                    <option value={windUnitquestion.text}>{windUnitquestion.text}</option>
+                                {/each}
+                            </select>
+                        </div>
                     </h4>
                 </h4>
             </h4>
@@ -108,34 +119,13 @@
 </section>
 
 <script lang="ts">
-    /*Vorlage für Settings:
-     <div>
-            <h4>
-                <strong>Settings (not operable yet): </strong><br />
-                <h4>
-                    Height:  
-                <select >
-                        <option>Meter</option> 
-                        <option>Feet</option> 
-                </select>
-                <h4>
-                    Increment:  
-                <select >
-                        <option>100</option> 
-                        <option>200</option> 
-                        <option>500</option>
-                        <option>1000</option>
-                </select>
-            </h4>
-        </div> */
-
     import bcast from '@windy/broadcast';
     import { map } from '@windy/map';
     import { onDestroy, onMount } from 'svelte';
     import config from './pluginConfig';
     import { singleclick } from '@windy/singleclick';
     import { UpperWind } from './classes/UpperWind.class';
-    import windyStore from '@windy/store';
+    import windyStore, { set } from '@windy/store';
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
@@ -159,16 +149,23 @@
     const { version } = config;
     const upperwind = new UpperWind();
 
-    /* Prepare dropdown list for setting the height increment */
-    let increments = [
-        { id: 1, text: `100` },
-        { id: 2, text: `200` },
-        { id: 3, text: `500` },
-        { id: 4, text: `1000` },
-        { id: 4, text: `2000` }
-    ];
+    /* Prepare dropdown list for settings*/
+    let settings = {
+        heightUnit: 'Feet',
+        increment: '1000',
+        windUnit: 'kt',
+    };
 
-    let selected: any;
+    let incrementquestions = [{ text: '100' }, { text: '200' }, { text: '500' }, { text: '1000' }, { text: '2000' }];
+    let heightUnitquestions = [{ text: 'Feet' }, { text: 'Meter' }];
+    let windUnitquestions = [{ text: 'kt' }, { text: 'm/s' }];
+
+    //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
+    $: console.log('---->', settings.increment);
+    $: console.log('---->', settings.heightUnit);
+    $: {console.log('---->', settings.windUnit);
+    }
+
 
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
@@ -180,7 +177,7 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-        
+
         popup
             .setLatLng([_params.lat, _params.lon])
             .setContent('Loading....')
@@ -189,8 +186,7 @@
         upperwind.setTime(windyStore.get('timestamp'));
         await upperwind.handleEvent(_params); // Wait for handleEvent to complete
         assignAnalysis(upperwind);
-        popup.setContent(clickLocation)
-            
+        popup.setContent(clickLocation);
     };
 
     const listener = () => {
