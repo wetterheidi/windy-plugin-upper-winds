@@ -121,6 +121,7 @@
     import { UpperWind } from './classes/UpperWind.class';
     import windyStore from '@windy/store';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
+    import metrics from '@windy/metrics';
 
     let ready = false;
     let flightLevels: any[] = [];
@@ -174,11 +175,11 @@
         await upperwind.handleEvent(_params); // Wait for handleEvent to complete
         assignAnalysis(upperwind);
         popup.setContent(clickLocation);
+        
     };
 
     const listener = () => {
         console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
-        //Versuch die Werte zu ändern, sobald die Zeit geändert wurde (geht noch nicht!)
         assignAnalysis(upperwind);
     };
 
@@ -203,6 +204,8 @@
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
+        console.log('----->metrics Test: ' + metrics.temp.convertNumber(234.9));
+        console.log('----->metrics Test: ' + metrics.temp.convertValue(234.9));
     });
 
     onDestroy(() => {
