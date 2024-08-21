@@ -1,5 +1,5 @@
-import { LocationDetails } from './Locationdetails.interface';
 import metrics from '@windy/metrics';
+import { LocationDetails } from './Locationdetails.interface';
 
 
 export class Utility {

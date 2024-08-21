@@ -79,7 +79,7 @@ export class UpperWind {
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
             this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data
-            this._step = 1000; // set height increment to interpolate
+            this._step = 500; // set height increment to interpolate
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
@@ -134,8 +134,8 @@ export class UpperWind {
 
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
-                const height = +(heightInMeters * 3.28084).toFixed(0); // Convert to feet
-                const heightAGL = +((heightInMeters - this.elevation) * 3.28084).toFixed(this._forecastColumn); // Convert to AGL
+                const height = +(metrics.altitude.convertNumber((weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn]), 2)); //Convert model output to User settings
+                const heightAGL = +(metrics.altitude.convertNumber((heightInMeters - this.elevation).toFixed(this._forecastColumn), 2)); // Convert to AGL
                 //First get u and v component of wind
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
@@ -173,31 +173,37 @@ export class UpperWind {
 
     private stratify(data: Sounding[]) {
         const result = [];
+
+        // Determine factor for height conversion depending on user settings
+        let mInFtFactor: number = 1;
+        if (Utility.findOutAltitudeUnit(1000) == 'ft') {
+            mInFtFactor = 3.28084;
+        } else if (Utility.findOutAltitudeUnit(1000) == 'm') {
+            mInFtFactor = 1;
+        }
         // Define the range of heights for interpolation
-        // Define start height so that AGL is rounded to 1000 ft
-        const startHeight = (Math.floor((data[0].height - this.elevation * 3.28084) / 1000) * 1000 + (this.elevation * 3.28084)); // Highest point (AMSL)
-        // Lowest point above ground level, rounded down to nearest 500, substract 500 to find ground level
-        let endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 500) * 500 - 500;
-        console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * 3.28084);
+        // Define start height so that AGL is rounded according to the "step"
+        const startHeight = (Math.floor((data[0].height - this.elevation * mInFtFactor) / this.step) * this.step + (this.elevation * mInFtFactor)); // Highest point (AMSL)
+        // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
+        let endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step / 2)) * (this.step / 2) - (this.step / 2);
+        console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
+        if (endHeight < 0) {
+            endHeight = 0;
+        }
+       
         // Avoiding NaN in pressure values greater then 1000 hPa
         if (isNaN(data[data.length - 1].pressure)) {
             //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
             data[data.length - 1].pressure = Utility.calculatePressure((data[data.length - 2].pressure), (data[data.length - 2].height));
-            console.log('berechneter Druck: ' + data[data.length - 1].pressure);
+            //console.log('berechneter Druck: ' + data[data.length - 1].pressure);
         } else if (isNaN(data[data.length - 2].pressure)) {
             data[data.length - 2].pressure = Utility.calculatePressure((data[data.length - 3].pressure), (data[data.length - 3].height));
-            console.log('berechneter Druck: ' + data[data.length - 2].pressure);
-        }
-
-        const step = this._step;
-
-        if (endHeight < 0) {
-            endHeight = 0;
+            //console.log('berechneter Druck: ' + data[data.length - 2].pressure);
         }
 
         let previousHuman = '';
-        for (let height = startHeight; height >= endHeight; height -= step) {
-            
+        for (let height = startHeight; height >= endHeight; height -= this.step) {
+
             // Find the nearest data points around the current height
             const upperBoundIndex = data.findIndex(d => d.height <= height);
             if (upperBoundIndex === -1) {
@@ -237,11 +243,11 @@ export class UpperWind {
             ratio,
         );
 
-        const heightAGL = Utility.linearInterpolation(
+        const heightAGL = Math.round(Utility.linearInterpolation(
             upper.heightAGL,
             lower.heightAGL,
             ratio,
-        );
+        )/10)*10; //Round to 10 to avoid rounding errors
 
         const temperature = Utility.linearInterpolation(
             upper.temperature,
@@ -307,7 +313,4 @@ export class UpperWind {
         return interpolated;
     }
 
-    private units(){
-        
-    }
 }

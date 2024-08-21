@@ -43,7 +43,7 @@
                         <th>RHw</th>
                     </tr>
                     <tr>
-                        <th>ft <br />AGL</th>
+                        <th>{altitudeUnit} <br />AGL</th>
                         <th>°</th>
                         <th>{windUnit}</th>
                         <th>hPa</th>
@@ -79,17 +79,6 @@
                 <h4>
                     <h4>
                         <div class="mb-3">
-                            <label for="" class="form-label">Height: </label>
-                            <select bind:value={settings.heightUnit} class="from-select">
-                                <option value="" disabled>-- Select Unit --</option>
-                                {#each heightUnitquestions as heightUnitquestion}
-                                    <option value={heightUnitquestion.text}
-                                        >{heightUnitquestion.text}</option
-                                    >
-                                {/each}
-                            </select>
-                        </div>
-                        <div class="mb-3">
                             <label for="" class="form-label">Increment: </label>
                             <select bind:value={settings.increment} class="from-select">
                                 <option value="" disabled>-- Select Increment --</option>
@@ -99,6 +88,7 @@
                                     >
                                 {/each}
                             </select>
+                            <label for="" class="form-label">{altitudeUnit} </label> 
                         </div>
                     </h4>
                 </h4>
@@ -161,14 +151,8 @@
 
     let altitudeUnit: string = Utility.findOutAltitudeUnit(100); // m in raw data
 
-    if (temperatureUnit === '°C') {
-        console.log('Celsius!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    }
-
     let settings = {
-        heightUnit: 'Feet',
-        increment: '1000',
-        windUnit: 'kt',
+        increment: upperwind.step,
     };
 
     let incrementquestions = [
@@ -178,17 +162,10 @@
         { text: '1000' },
         { text: '2000' },
     ];
-    let heightUnitquestions = [{ text: 'Feet' }, { text: 'Meter' }];
 
     //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
     $: {
         console.log('---->', settings.increment);
-    }
-    $: {
-        console.log('---->', settings.heightUnit);
-    }
-    $: {
-        console.log('---->', settings.windUnit);
     }
 
     /* Add layer for lines to the map*/
