@@ -190,7 +190,6 @@ export class UpperWind {
         }
 
         const step = this._step;
-        //const step: number = 1000;
 
         if (endHeight < 0) {
             endHeight = 0;
@@ -198,13 +197,7 @@ export class UpperWind {
 
         let previousHuman = '';
         for (let height = startHeight; height >= endHeight; height -= step) {
-            /* Flexible steps depending on height
-            if (height > 10000) {
-                step = 1000;
-            } else {
-                step = 500;
-            }*/
-
+            
             // Find the nearest data points around the current height
             const upperBoundIndex = data.findIndex(d => d.height <= height);
             if (upperBoundIndex === -1) {
@@ -223,11 +216,6 @@ export class UpperWind {
                 result.push(currentLayer);
             }
         }
-
-        console.log('Versuch: ' +  Utility.findOutTemperatureUnit(273)); //Kelvin in raw data
-        console.log('Versuch: ' +  Utility.findOutWindUnit(10)); // m/s in raw data
-        console.log('Versuch: ' +  Utility.findOutAltitudeUnit(100)); // m in raw data
-
         return result;
     }
 
