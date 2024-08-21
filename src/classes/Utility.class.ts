@@ -44,7 +44,7 @@ export class Utility {
   static windSpeed(uComponent: number, vComponent: number): number {
     // wind speed calculated from wind_u and wind_v component
     let ff: number = 0;
-    ff = Math.sqrt(uComponent ** 2 + vComponent ** 2);
+    ff = metrics.wind.convertNumber(Math.sqrt(uComponent ** 2 + vComponent ** 2)); // Convert windspeed from m/s raw data to User settings
     return ff;
   }
 

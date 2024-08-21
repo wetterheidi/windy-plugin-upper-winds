@@ -45,7 +45,7 @@
                     <tr>
                         <th>ft <br />AGL</th>
                         <th>°</th>
-                        <th>kt</th>
+                        <th>{windUnit}</th>
                         <th>hPa</th>
                         <th>{temperatureUnit}</th>
                         <th>{temperatureUnit}</th>
@@ -61,7 +61,7 @@
                         >
                             <td>{heightAGL}</td>
                             <td>{windDir}</td>
-                            <td>{Math.round((windSp * 3.6) / 1.852)}</td>
+                            <td>{windSp}</td>
                             <td>{pressure}</td>
                             <td>{temperature}</td>
                             <td>{dewPointt}</td>
@@ -158,15 +158,18 @@
     const upperwind = new UpperWind();
 
     /* Take user settings for Table*/
-    let temperatureUnit: string = Utility.findOutTemperatureUnit(273); //Kelvin in raw data
+    /* Settings for temperature*/
+    let temperatureUnit: string = Utility.findOutTemperatureUnit(273.15); //Kelvin in raw data
     let freezingLevelAt: number = 0;
     if (temperatureUnit === '°C') {
         freezingLevelAt = 0;
     } else if (temperatureUnit === '°F') {
         freezingLevelAt = 32;
     };
-
+    /* Settings for wind*/
     let windUnit: string = Utility.findOutWindUnit(10); // m/s in raw data
+
+
     let altitudeUnit: string = Utility.findOutAltitudeUnit(100); // m in raw data
 
     if (temperatureUnit === '°C') {
@@ -250,17 +253,7 @@
             assignAnalysis(upperwind);
         });
 
-        console.log('Versuch 273: ' + metrics.temp.convertNumber(273, 2, '°F')); //Kelvin in raw data
-        console.log('Versuch 273.15: ' + metrics.temp.convertNumber(273.15, 2)); //Kelvin in raw data
-        console.log('Versuch283: ' + metrics.temp.convertNumber(283, 2)); //Kelvin in raw data
-        console.log('Versuch 293: ' + metrics.temp.convertNumber(293, 2)); //Kelvin in raw data
-        console.log('Versuch 190: ' + metrics.temp.convertNumber(190, 2)); //Kelvin in raw data
-        console.log('Versuch 200: ' + metrics.temp.convertNumber(200, 2)); //Kelvin in raw data
-        console.log('Versuch 210: ' + metrics.temp.convertNumber(210, 2)); //Kelvin in raw data
-        console.log('Versuch 217.655: ' + metrics.temp.convertNumber(217.655, 2)); //Kelvin in raw data
-        console.log('Versuch 356.12: ' + metrics.temp.convertNumber(356.12, 2)); //Kelvin in raw data
-        console.log('Versuch 273.666: ' + metrics.temp.convertNumber(273.666, 2)); //Kelvin in raw data
-        console.log('Versuch: ' + metrics.wind.convertNumber(10, 2)); // m/s in raw data
+        console.log('Versuch: ' + metrics.wind.convertNumber(10, 3)); // m/s in raw data
         console.log('Versuch: ' + metrics.altitude.convertNumber(100, 2)); // m in raw data
     });
 
