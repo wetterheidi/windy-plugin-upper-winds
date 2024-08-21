@@ -55,9 +55,10 @@
                 <tbody>
                     {#each flightLevels as { heightAGL, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
                         <tr
-                            class:green-text={temperature > (freezingLevelAt-0.5) && temperature < (freezingLevelAt+0.5)}
-                            class:blue-text={temperature <= (freezingLevelAt-0.5)}
-                            class:red-text={temperature >= (freezingLevelAt+0.5)}
+                            class:green-text={temperature > freezingLevelAt - 0.5 &&
+                                temperature < freezingLevelAt + 0.5}
+                            class:blue-text={temperature <= freezingLevelAt - 0.5}
+                            class:red-text={temperature >= freezingLevelAt + 0.5}
                         >
                             <td>{heightAGL}</td>
                             <td>{windDir}</td>
@@ -95,17 +96,6 @@
                                 {#each incrementquestions as incrementquestion}
                                     <option value={incrementquestion.text}
                                         >{incrementquestion.text}</option
-                                    >
-                                {/each}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="" class="form-label">Wind: </label>
-                            <select bind:value={settings.windUnit} class="from-select">
-                                <option value="" disabled>-- Select Unit --</option>
-                                {#each windUnitquestions as windUnitquestion}
-                                    <option value={windUnitquestion.text}
-                                        >{windUnitquestion.text}</option
                                     >
                                 {/each}
                             </select>
@@ -165,10 +155,9 @@
         freezingLevelAt = 0;
     } else if (temperatureUnit === '°F') {
         freezingLevelAt = 32;
-    };
+    }
     /* Settings for wind*/
     let windUnit: string = Utility.findOutWindUnit(10); // m/s in raw data
-
 
     let altitudeUnit: string = Utility.findOutAltitudeUnit(100); // m in raw data
 
@@ -190,7 +179,6 @@
         { text: '2000' },
     ];
     let heightUnitquestions = [{ text: 'Feet' }, { text: 'Meter' }];
-    let windUnitquestions = [{ text: 'kt' }, { text: 'm/s' }];
 
     //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
     $: {
@@ -235,15 +223,15 @@
         /** Eventhandler for the click on the map*/
         singleclick.on('windy-plugin-upper-winds', async ev => {
             position = { lat: ev.lat, lon: ev.lon };
-            await upperwind.handleEvent(ev); // Wait for handleEvent to complete
-            assignAnalysis(upperwind);
-
             /* Create a Popup to show the clicked position*/
             popup
                 .setLatLng([position.lat, position.lon])
-                .setContent(clickLocation)
+                .setContent('Loading....')
                 .addTo(activeLayer)
                 .openOn(map);
+            await upperwind.handleEvent(ev); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+            popup.setContent(clickLocation);
         });
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
