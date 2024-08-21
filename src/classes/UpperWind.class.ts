@@ -142,9 +142,9 @@ export class UpperWind {
                 //Then calculate wind direction and speed using Utility class
                 const windDir = +(Utility.windDirection(wind_u, wind_v)).toFixed(0); // Calculate wind direction
                 const windSp = +(Utility.windSpeed(wind_u, wind_v)).toFixed(0); // Calculate wind speed
-                const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
+                const temperature = +(metrics.temp.convertNumber(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn])).toFixed(0); // Convert Kelvin to User Settings
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
-                const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
+                const dewPointt = +(metrics.temp.convertNumber(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn])).toFixed(0); // Convert Kelvin to User Settings
 
 
                 this._rawdata.push({
@@ -224,7 +224,7 @@ export class UpperWind {
             }
         }
 
-        console.log('Versuch: ' +  Utility.findOutTemperatureUnit(273.15)); //Kelvin in raw data
+        console.log('Versuch: ' +  Utility.findOutTemperatureUnit(273)); //Kelvin in raw data
         console.log('Versuch: ' +  Utility.findOutWindUnit(10)); // m/s in raw data
         console.log('Versuch: ' +  Utility.findOutAltitudeUnit(100)); // m in raw data
 

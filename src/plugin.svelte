@@ -47,17 +47,17 @@
                         <th>°</th>
                         <th>kt</th>
                         <th>hPa</th>
-                        <th>°C</th>
-                        <th>°C</th>
+                        <th>{temperatureUnit}</th>
+                        <th>{temperatureUnit}</th>
                         <th>%</th>
                     </tr>
                 </thead>
                 <tbody>
                     {#each flightLevels as { heightAGL, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
                         <tr
-                            class:green-text={temperature > -0.5 && temperature < 0.5}
-                            class:blue-text={temperature <= -0.5}
-                            class:red-text={temperature >= 0.5}
+                            class:green-text={temperature > (freezingLevelAt-0.5) && temperature < (freezingLevelAt+0.5)}
+                            class:blue-text={temperature <= (freezingLevelAt-0.5)}
+                            class:red-text={temperature >= (freezingLevelAt+0.5)}
                         >
                             <td>{heightAGL}</td>
                             <td>{windDir}</td>
@@ -135,7 +135,7 @@
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
-    import { Utility } from './Utility.class';
+    import { Utility } from './classes//Utility.class';
     import metrics from '@windy/metrics';
 
     enum Format {
@@ -157,7 +157,22 @@
     const { version } = config;
     const upperwind = new UpperWind();
 
-    /* Prepare dropdown list for settings*/
+    /* Take user settings for Table*/
+    let temperatureUnit: string = Utility.findOutTemperatureUnit(273); //Kelvin in raw data
+    let freezingLevelAt: number = 0;
+    if (temperatureUnit === '°C') {
+        freezingLevelAt = 0;
+    } else if (temperatureUnit === '°F') {
+        freezingLevelAt = 32;
+    };
+
+    let windUnit: string = Utility.findOutWindUnit(10); // m/s in raw data
+    let altitudeUnit: string = Utility.findOutAltitudeUnit(100); // m in raw data
+
+    if (temperatureUnit === '°C') {
+        console.log('Celsius!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    }
+
     let settings = {
         heightUnit: 'Feet',
         increment: '1000',
@@ -235,8 +250,18 @@
             assignAnalysis(upperwind);
         });
 
-        console.log('----->metrics Test: ' + metrics.wind.convertNumber(234.9));
-        console.log('----->metrics Test: ' + metrics.wind.convertValue(234.9));
+        console.log('Versuch 273: ' + metrics.temp.convertNumber(273, 2, '°F')); //Kelvin in raw data
+        console.log('Versuch 273.15: ' + metrics.temp.convertNumber(273.15, 2)); //Kelvin in raw data
+        console.log('Versuch283: ' + metrics.temp.convertNumber(283, 2)); //Kelvin in raw data
+        console.log('Versuch 293: ' + metrics.temp.convertNumber(293, 2)); //Kelvin in raw data
+        console.log('Versuch 190: ' + metrics.temp.convertNumber(190, 2)); //Kelvin in raw data
+        console.log('Versuch 200: ' + metrics.temp.convertNumber(200, 2)); //Kelvin in raw data
+        console.log('Versuch 210: ' + metrics.temp.convertNumber(210, 2)); //Kelvin in raw data
+        console.log('Versuch 217.655: ' + metrics.temp.convertNumber(217.655, 2)); //Kelvin in raw data
+        console.log('Versuch 356.12: ' + metrics.temp.convertNumber(356.12, 2)); //Kelvin in raw data
+        console.log('Versuch 273.666: ' + metrics.temp.convertNumber(273.666, 2)); //Kelvin in raw data
+        console.log('Versuch: ' + metrics.wind.convertNumber(10, 2)); // m/s in raw data
+        console.log('Versuch: ' + metrics.altitude.convertNumber(100, 2)); // m in raw data
     });
 
     onDestroy(() => {
