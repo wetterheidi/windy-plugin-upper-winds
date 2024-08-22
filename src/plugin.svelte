@@ -163,9 +163,8 @@
 
     //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
     $: {
-        console.log('---->', settings.increment);
+        console.log('----> Step set to: ', settings.increment);
         upperwind._step = Number(settings.increment);
-        console.log('Step in der Variablen' + upperwind._step);
     }
 
     /* Add layer for lines to the map*/
@@ -184,15 +183,22 @@
             .setContent('Loading....')
             .addTo(activeLayer)
             .openOn(map);
-        upperwind.setTime(windyStore.get('timestamp'));
-        await upperwind.handleEvent(_params); // Wait for handleEvent to complete
-        assignAnalysis(upperwind);
-        popup.setContent(clickLocation);
+        bcast.on('pluginOpened', async () => {
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(_params); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+            popup.setContent(clickLocation);
+        });
+        bcast.on('paramsChanged', async () => {
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(_params); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+        });
+        
     };
 
     const listener = () => {
         console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
-        //Versuch die Werte zu ändern, sobald die Zeit geändert wurde (geht noch nicht!)
         assignAnalysis(upperwind);
     };
 
@@ -217,9 +223,6 @@
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
-
-        console.log('Versuch: ' + metrics.wind.convertNumber(10, 3)); // m/s in raw data
-        console.log('Versuch: ' + metrics.altitude.convertNumber(100, 2)); // m in raw data
     });
 
     onDestroy(() => {
@@ -274,12 +277,20 @@
             });
             const csv = generateCsv(csvConfig)(flightLevels);
             const blob = asBlob(csvConfig)(csv);
-            saveTemplateAsFile(forecastDateString + '_' + forecastModel + '.csv', blob, 'text/csv;charset=utf-8');
+            saveTemplateAsFile(
+                forecastDateString + '_' + forecastModel + '.csv',
+                blob,
+                'text/csv;charset=utf-8',
+            );
         }
         if (format === Format.FMT_JSON) {
             const data = JSON.stringify(flightLevels, undefined, 2);
             const blob = new Blob([data], { type: 'text/json' });
-            saveTemplateAsFile(forecastDateString + '_' + forecastModel + '.json', blob, 'text/json');
+            saveTemplateAsFile(
+                forecastDateString + '_' + forecastModel + '.json',
+                blob,
+                'text/json',
+            );
         }
         if (format === Format.FMT_HEIDIS) {
             // which keys to extract into columns, by field order
@@ -294,6 +305,20 @@
                 'windDir',
                 'windSp',
             ];
+
+            let headerLine1 = ['p', 'hAMSL', 'hAGL', 'T', 'Td', 'u', 'v', 'Dir', 'Spd'];
+            let headerLine2 = [
+                'hPa',
+                altitudeUnit,
+                altitudeUnit,
+                temperatureUnit,
+                temperatureUnit,
+                'm/s',
+                'm/s',
+                'deg',
+                windUnit,
+            ];
+
             const lineSeparator = `\n`;
             const fieldSeparator = ' ';
             const rowConverter = (row: any) => {
@@ -302,6 +327,7 @@
                     .join('')
                     .slice(0, -1);
             };
+
             const data = flightLevels.map(rowConverter).join(lineSeparator);
             const blob = new Blob([data], { type: 'text/plain' });
             saveTemplateAsFile(
