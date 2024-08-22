@@ -10,11 +10,10 @@
     </div>
 
     {#if !ready}
-
-    <div>
-        <h4>
-            <strong>Settings: </strong><br />
+        <div>
             <h4>
+                <strong>Settings: </strong><br />
+                <h4>
                     <div class="mb-3">
                         <label for="" class="form-label">Choose interpolation step: </label>
                         <select bind:value={settings.increment} class="from-select">
@@ -25,12 +24,12 @@
                                 >
                             {/each}
                         </select>
-                        <label for="" class="form-label">{altitudeUnit} </label> 
+                        <label for="" class="form-label">{altitudeUnit} </label>
                     </div>
+                </h4>
             </h4>
-        </h4>
-    </div>
-    <hr />
+        </div>
+        <hr />
         <h4><strong>Click on map to generate an upper wind table</strong></h4>
     {:else}
         <h4>
@@ -92,7 +91,7 @@
                     {/each}
                 </tbody>
             </table>
-        </div>        
+        </div>
         <hr />
         <div style="text-align:center">
             <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
@@ -110,7 +109,7 @@
     import config from './pluginConfig';
     import { singleclick } from '@windy/singleclick';
     import { UpperWind } from './classes/UpperWind.class';
-    import windyStore, { set } from '@windy/store';
+    import windyStore from '@windy/store';
     // see https://www.npmjs.com/package/export-to-csv
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
@@ -275,12 +274,12 @@
             });
             const csv = generateCsv(csvConfig)(flightLevels);
             const blob = asBlob(csvConfig)(csv);
-            saveTemplateAsFile('flightLevels.csv', blob, 'text/csv;charset=utf-8');
+            saveTemplateAsFile(forecastDateString + '_' + forecastModel + '.csv', blob, 'text/csv;charset=utf-8');
         }
         if (format === Format.FMT_JSON) {
             const data = JSON.stringify(flightLevels, undefined, 2);
             const blob = new Blob([data], { type: 'text/json' });
-            saveTemplateAsFile('flightLevels.json', blob, 'text/json');
+            saveTemplateAsFile(forecastDateString + '_' + forecastModel + '.json', blob, 'text/json');
         }
         if (format === Format.FMT_HEIDIS) {
             // which keys to extract into columns, by field order
@@ -305,7 +304,11 @@
             };
             const data = flightLevels.map(rowConverter).join(lineSeparator);
             const blob = new Blob([data], { type: 'text/plain' });
-            saveTemplateAsFile('flightLevels.txt', blob, 'text/plain');
+            saveTemplateAsFile(
+                forecastDateString + '_' + forecastModel + '.txt',
+                blob,
+                'text/plain',
+            );
         }
     }
 </script>
