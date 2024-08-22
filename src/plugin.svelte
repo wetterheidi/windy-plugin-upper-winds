@@ -93,12 +93,6 @@
                 </tbody>
             </table>
         </div>        
-        <hr />
-        <div style="text-align:center">
-            <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
-            <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
-            <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
-        </div>
     {/if}
     <hr />
 </section>
