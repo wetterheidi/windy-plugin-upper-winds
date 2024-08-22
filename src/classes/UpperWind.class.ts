@@ -29,7 +29,7 @@ export class UpperWind {
     /** Terrain elevation */
     private _elevation = 0;
     /** Step (i.e. height increment to interpolate) */
-    private _step = 0;
+    public _step = 0;
 
 
     setTime(t: number) {
@@ -45,8 +45,8 @@ export class UpperWind {
         return this._elevation;
     }
 
-    /** Return step */
-    get step() {
+     /** Return step */
+     get step() {
         return this._step;
     }
 
@@ -62,15 +62,13 @@ export class UpperWind {
 
     get forecastDate() {
         const date = new Date(this._forecastDate);
-        //Versuch Zeit akualisieren
-        //const date = new Date(store.get('timestamp'));
         return date.toString();
     }
 
     get model() {
         return this._model;
     }
-
+    
     /** Handle the click event (The request for the upper wind analysis) */
     async handleEvent(ev: { lat: any; lon: any }) {
         try {
@@ -79,11 +77,13 @@ export class UpperWind {
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
             this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data
-            this._step = 500; // set height increment to interpolate
+            //this._step = 500; // set height increment to interpolate
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
+
+            console.log('step in upperwinds: ' + this._step);
         } catch (error) {
             console.error('* * * An error occurred:', error);
         }

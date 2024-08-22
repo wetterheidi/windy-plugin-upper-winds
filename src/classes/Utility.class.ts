@@ -1,5 +1,6 @@
 import metrics from '@windy/metrics';
 import { LocationDetails } from './Locationdetails.interface';
+import { UpperWind } from './UpperWind.class';
 
 
 export class Utility {
@@ -101,8 +102,6 @@ export class Utility {
     } else if (temperatureString.match('°F')) {
       unitTemperature = '°F';
     }
-    console.log('Umgewandelte temperatur ' + temperatureString);
-    console.log('------> Temperatureinheit rausgefischt?: ' + unitTemperature);
     return unitTemperature;
   }
 
@@ -121,8 +120,6 @@ export class Utility {
     } else if (windString.match('mph')) {
       unitWind = 'mph';
     }
-    console.log('Umgewandelte Wind ' + windString);
-    console.log('------> Windeinheit rausgefischt?: ' + unitWind);
     return unitWind;
   }
 
@@ -135,8 +132,7 @@ export class Utility {
     } else if (altitudeString.match('ft')) {
       unitALtitude = 'ft';
     }
-    console.log('Umgewandelte Höhe ' + altitudeString);
-    console.log('------> Höheneinheit rausgefischt?: ' + unitALtitude);
     return unitALtitude;
   }
+
 }
