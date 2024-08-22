@@ -5,8 +5,10 @@ import {
     MeteogramDataPayload,
     MeteogramDataHash,
 } from '@windycom/plugin-devtools/types/interfaces';
+import metrics from '@windy/metrics';
 import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
+
 
 export class UpperWind {
 
@@ -27,7 +29,7 @@ export class UpperWind {
     /** Terrain elevation */
     private _elevation = 0;
     /** Step (i.e. height increment to interpolate) */
-    private _step = 0;
+    public _step = 0;
 
 
     setTime(t: number) {
@@ -43,8 +45,8 @@ export class UpperWind {
         return this._elevation;
     }
 
-    /** Return step */
-    get step() {
+     /** Return step */
+     get step() {
         return this._step;
     }
 
@@ -60,15 +62,13 @@ export class UpperWind {
 
     get forecastDate() {
         const date = new Date(this._forecastDate);
-        //Versuch Zeit akualisieren
-        //const date = new Date(store.get('timestamp'));
         return date.toString();
     }
 
     get model() {
         return this._model;
     }
-
+    
     /** Handle the click event (The request for the upper wind analysis) */
     async handleEvent(ev: { lat: any; lon: any }) {
         try {
@@ -77,11 +77,13 @@ export class UpperWind {
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
             this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data
-            this._step = 1000; // set height increment to interpolate
+            //this._step = 500; // set height increment to interpolate
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
+
+            console.log('step in upperwinds: ' + this._step);
         } catch (error) {
             console.error('* * * An error occurred:', error);
         }
@@ -132,18 +134,17 @@ export class UpperWind {
 
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
-                const height = +(heightInMeters * 3.28084).toFixed(0); // Convert to feet
-                const heightAGL = +((heightInMeters - this.elevation) * 3.28084).toFixed(this._forecastColumn); // Convert to AGL
+                const height = +(metrics.altitude.convertNumber((weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn]), 2)); //Convert model output to User settings
+                const heightAGL = +(metrics.altitude.convertNumber((heightInMeters - this.elevation).toFixed(this._forecastColumn), 2)); // Convert to AGL
                 //First get u and v component of wind
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 //Then calculate wind direction and speed using Utility class
                 const windDir = +(Utility.windDirection(wind_u, wind_v)).toFixed(0); // Calculate wind direction
-                const windSp = +(Utility.windSpeed(wind_u, wind_v)).toFixed(0); // Calculate wind speed
-                const temperature = +(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0); // Convert Kelvin to Celsius
+                const windSp = +(Utility.windSpeed(wind_u, wind_v)).toFixed(0); // Calculate wind speed 
+                const temperature = +(metrics.temp.convertNumber(weatherData.data[tempKey as keyof MeteogramDataHash][this._forecastColumn])).toFixed(0); // Convert Kelvin to User Settings
                 const humidityWater = +weatherData.data[humidityKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
-                const dewPointt = +(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn] - 273.15).toFixed(0);
-
+                const dewPointt = +(metrics.temp.convertNumber(weatherData.data[dewpointKey as keyof MeteogramDataHash][this._forecastColumn])).toFixed(0); // Convert Kelvin to User Settings
 
 
                 this._rawdata.push({
@@ -172,37 +173,36 @@ export class UpperWind {
 
     private stratify(data: Sounding[]) {
         const result = [];
+
+        // Determine factor for height conversion depending on user settings
+        let mInFtFactor: number = 1;
+        if (Utility.findOutAltitudeUnit(1000) == 'ft') {
+            mInFtFactor = 3.28084;
+        } else if (Utility.findOutAltitudeUnit(1000) == 'm') {
+            mInFtFactor = 1;
+        }
         // Define the range of heights for interpolation
-        // Define start height so that AGL is rounded to 1000 ft
-        const startHeight = (Math.floor((data[0].height - this.elevation * 3.28084) / 1000) * 1000 + (this.elevation * 3.28084)); // Highest point (AMSL)
-        // Lowest point above ground level, rounded down to nearest 500, substract 500 to find ground level
-        let endHeight = Math.ceil((data[data.length - 1].height + this.elevation * 3.28084) / 500) * 500 - 500;
-        console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * 3.28084);
+        // Define start height so that AGL is rounded according to the "step"
+        const startHeight = (Math.floor((data[0].height - this.elevation * mInFtFactor) / this.step) * this.step + (this.elevation * mInFtFactor)); // Highest point (AMSL)
+        // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
+        let endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step / 2)) * (this.step / 2) - (this.step / 2);
+        console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
+        if (endHeight < 0) {
+            endHeight = 0;
+        }
+       
         // Avoiding NaN in pressure values greater then 1000 hPa
         if (isNaN(data[data.length - 1].pressure)) {
             //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
             data[data.length - 1].pressure = Utility.calculatePressure((data[data.length - 2].pressure), (data[data.length - 2].height));
-            console.log('berechneter Druck: ' + data[data.length - 1].pressure);
+            //console.log('berechneter Druck: ' + data[data.length - 1].pressure);
         } else if (isNaN(data[data.length - 2].pressure)) {
             data[data.length - 2].pressure = Utility.calculatePressure((data[data.length - 3].pressure), (data[data.length - 3].height));
-            console.log('berechneter Druck: ' + data[data.length - 2].pressure);
-        }
-
-        const step = this._step;
-        //const step: number = 1000;
-
-        if (endHeight < 0) {
-            endHeight = 0;
+            //console.log('berechneter Druck: ' + data[data.length - 2].pressure);
         }
 
         let previousHuman = '';
-        for (let height = startHeight; height >= endHeight; height -= step) {
-            /* Flexible steps depending on height
-            if (height > 10000) {
-                step = 1000;
-            } else {
-                step = 500;
-            }*/
+        for (let height = startHeight; height >= endHeight; height -= this.step) {
 
             // Find the nearest data points around the current height
             const upperBoundIndex = data.findIndex(d => d.height <= height);
@@ -222,7 +222,6 @@ export class UpperWind {
                 result.push(currentLayer);
             }
         }
-
         return result;
     }
 
@@ -244,11 +243,11 @@ export class UpperWind {
             ratio,
         );
 
-        const heightAGL = Utility.linearInterpolation(
+        const heightAGL = Math.round(Utility.linearInterpolation(
             upper.heightAGL,
             lower.heightAGL,
             ratio,
-        );
+        )/10)*10; //Round to 10 to avoid rounding errors
 
         const temperature = Utility.linearInterpolation(
             upper.temperature,
@@ -313,4 +312,5 @@ export class UpperWind {
 
         return interpolated;
     }
+
 }

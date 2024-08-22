@@ -6,6 +6,10 @@ Plugin to get upper winds, temperature and humidity interpolated to human readab
 
 Due to Windy security restrictions, the plugin is only available on the desktop versions of Windy.
 
+* Units in the table are set to your individual settings for Windy.
+* Temperature values higher than freezing level are red, freezing level is green and temperature below freezing level is blue colored.
+
+
 ## Installation:
 
 * To install an update, delete the existing plugin from Windy and load the latest version.

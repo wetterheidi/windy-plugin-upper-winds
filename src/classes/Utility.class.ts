@@ -1,4 +1,7 @@
+import metrics from '@windy/metrics';
 import { LocationDetails } from './Locationdetails.interface';
+import { UpperWind } from './UpperWind.class';
+
 
 export class Utility {
 
@@ -42,7 +45,7 @@ export class Utility {
   static windSpeed(uComponent: number, vComponent: number): number {
     // wind speed calculated from wind_u and wind_v component
     let ff: number = 0;
-    ff = Math.sqrt(uComponent ** 2 + vComponent ** 2);
+    ff = metrics.wind.convertNumber(Math.sqrt(uComponent ** 2 + vComponent ** 2)); // Convert windspeed from m/s raw data to User settings
     return ff;
   }
 
@@ -88,6 +91,48 @@ export class Utility {
     qnh = Math.round(Math.pow((Math.pow(p, a) + b * (h / 3.28084)), (1 / a)));
 
     return qnh;
+  }
+
+  static findOutTemperatureUnit(temperature: number): string {
+    // find out the unit from user settings
+    let unitTemperature: string = '';
+    const temperatureString: string = metrics.temp.convertValue(temperature);
+    if (temperatureString.match('°C')) {
+      unitTemperature = '°C';
+    } else if (temperatureString.match('°F')) {
+      unitTemperature = '°F';
+    }
+    return unitTemperature;
+  }
+
+  static findOutWindUnit(wind: number): string {
+    // find out the unit from user settings
+    let unitWind: string = '';
+    const windString: string = metrics.wind.convertValue(wind);
+    if (windString.match('kt')) {
+      unitWind = 'kt';
+    } else if (windString.match('bft')) {
+      unitWind = 'bft';
+    } else if (windString.match('m/s')) {
+      unitWind = 'm/s';
+    } else if (windString.match('km/h')) {
+      unitWind = 'km/h';
+    } else if (windString.match('mph')) {
+      unitWind = 'mph';
+    }
+    return unitWind;
+  }
+
+  static findOutAltitudeUnit(altitude: number): string {
+    // find out the unit from user settings
+    let unitALtitude: string = '';
+    const altitudeString: string = metrics.altitude.convertValue(altitude);
+    if (altitudeString.match('m')) {
+      unitALtitude = 'm';
+    } else if (altitudeString.match('ft')) {
+      unitALtitude = 'ft';
+    }
+    return unitALtitude;
   }
 
 }
