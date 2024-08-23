@@ -10,28 +10,7 @@
     </div>
 
     {#if !ready}
-
-    <div>
-        <h4>
-            <strong>Settings: </strong><br />
-            <h4>
-                    <div class="mb-3">
-                        <label for="" class="form-label">Choose interpolation step: </label>
-                        <select bind:value={settings.increment} class="from-select">
-                            <option value="" disabled>-- Select Increment --</option>
-                            {#each incrementquestions as incrementquestion}
-                                <option value={incrementquestion.text}
-                                    >{incrementquestion.text}</option
-                                >
-                            {/each}
-                        </select>
-                        <label for="" class="form-label">{altitudeUnit} </label> 
-                    </div>
-            </h4>
-        </h4>
-    </div>
-    <hr />
-        <h4><strong>Click on map to generate an upper wind table</strong></h4>
+               <h4><strong>Click on map to generate an upper wind table</strong></h4>
     {:else}
         <h4>
             <strong>Location: </strong><br />
@@ -92,7 +71,33 @@
                     {/each}
                 </tbody>
             </table>
-        </div>        
+        </div>
+        <hr />
+        <div>
+            <h4>
+                <strong>Settings: </strong><br />
+                <h4>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Choose interpolation step: </label>
+                        <select bind:value={settings.increment} class="from-select">
+                            <option value="" disabled>-- Select Increment --</option>
+                            {#each incrementquestions as incrementquestion}
+                                <option value={incrementquestion.text}
+                                    >{incrementquestion.text}</option
+                                >
+                            {/each}
+                        </select>
+                        <label for="" class="form-label">{altitudeUnit} </label>
+                    </div>
+                </h4>
+            </h4>
+        </div>
+        <hr />
+        <div style="text-align:center">
+            <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
+            <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
+            <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
+        </div>
     {/if}
     <hr />
 </section>
@@ -107,7 +112,6 @@
     import windyStore from '@windy/store';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
     import { Utility } from './classes//Utility.class';
-    import metrics from '@windy/metrics';
 
     let ready = false;
     let flightLevels: any[] = [];
@@ -151,9 +155,12 @@
 
     //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
     $: {
-        console.log('---->', settings.increment);
+        console.log('----> Step set to: ', settings.increment);
         upperwind._step = Number(settings.increment);
-        console.log('Step in der Variablen' + upperwind._step);
+        const fl = upperwind.restratify();
+        if (fl) {
+            flightLevels = fl;
+        }
     }
 
     /* Add layer for lines to the map*/
@@ -172,10 +179,17 @@
             .setContent('Loading....')
             .addTo(activeLayer)
             .openOn(map);
-        upperwind.setTime(windyStore.get('timestamp'));
-        await upperwind.handleEvent(_params); // Wait for handleEvent to complete
-        assignAnalysis(upperwind);
-        popup.setContent(clickLocation);
+        bcast.on('pluginOpened', async () => {
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(_params); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+            popup.setContent(clickLocation);
+        });
+        bcast.on('paramsChanged', async () => {
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(_params); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+        });
         
     };
 
@@ -205,9 +219,6 @@
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
-
-        console.log('Versuch: ' + metrics.wind.convertNumber(10, 3)); // m/s in raw data
-        console.log('Versuch: ' + metrics.altitude.convertNumber(100, 2)); // m in raw data
     });
 
     onDestroy(() => {

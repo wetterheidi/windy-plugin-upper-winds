@@ -18,6 +18,7 @@ Due to Windy security restrictions, the plugin is only available on the desktop 
 
 * Click on the map to show upperwinds, temperature and humidity for the selected position on the right hand panel.
 * Using the timeslider you can choose a forecast for the selected position for all available models in the given area of interest.
+* The interpolation step also can be selected in the settings.
 
 
 
