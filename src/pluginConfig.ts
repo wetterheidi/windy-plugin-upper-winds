@@ -6,7 +6,7 @@ const config: ExternalPluginConfig = {
     icon: '🪂',
     title: 'Upper winds',
     description: 'Show upper winds, temperature and humidity at a given position',
-    author: 'Heidi Schmid',
+    author: 'Wetterheidi',
     repository: 'https://github.com/wetterheidi/windy-plugin-upper-winds.git',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
