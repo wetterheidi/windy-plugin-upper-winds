@@ -10,7 +10,7 @@
     </div>
 
     {#if !ready}
-               <h4><strong>Click on map to generate an upper wind table</strong></h4>
+        <h4><strong>Click on map to generate an upper wind table</strong></h4>
     {:else}
         <h4>
             <strong>Location: </strong><br />
@@ -197,7 +197,6 @@
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
-        
     };
 
     const listener = () => {
@@ -297,35 +296,41 @@
         }
         if (format === Format.FMT_HEIDIS) {
             // which keys to extract into columns, by field order
+
             const sequence = [
-                'pressure',
-                'height',
-                'heightAGL',
-                'temperature',
-                'dewPointt',
-                'wind_u',
-                'wind_v',
-                'windDir',
-                'windSp',
+                { key: 'pressure', header: 'p', unit: 'hPa' },
+                { key: 'height', header: 'hAMSL', unit: altitudeUnit },
+                { key: 'heightAGL', header: 'hAGL', unit: altitudeUnit },
+                { key: 'temperature', header: 'T', unit: temperatureUnit },
+                { key: 'dewPointt', header: 'Td', unit: temperatureUnit },
+                { key: 'wind_u', header: 'u', unit: 'm/s' },
+                { key: 'wind_v', header: 'v', unit: 'm/s' },
+                { key: 'windDir', header: 'Dir', unit: 'deg' },
+                { key: 'windSp', header: 'Spd', unit: windUnit },
             ];
-
-            let headerLine1 = ['p', 'hAMSL', 'hAGL', 'T', 'Td', 'u', 'v', 'Dir', 'Spd'];
-            let headerLine2 = ['hPa', altitudeUnit, altitudeUnit, temperatureUnit, temperatureUnit, 'm/s', 'm/s', 'deg', windUnit,];
-
 
             const lineSeparator = `\n`;
             const fieldSeparator = ' ';
             const rowConverter = (row: any) => {
                 return sequence
-                    .map(field => `${row[field]}` + fieldSeparator)
+                    .map(field => `${row[field.key]}` + fieldSeparator)
                     .join('')
                     .slice(0, -1);
             };
 
             const data = flightLevels.map(rowConverter).join(lineSeparator);
+            const columnNames =
+                sequence
+                    .map(fd => fd.header + fieldSeparator)
+                    .join('')
+                    .slice(0, -1) + lineSeparator;
+            const units =
+                sequence
+                    .map(fd => fd.unit + fieldSeparator)
+                    .join('')
+                    .slice(0, -1) + lineSeparator;
 
-
-            const blob = new Blob([data], { type: 'text/plain' });
+            const blob = new Blob([columnNames + units + data], { type: 'text/plain' });
             saveTemplateAsFile(
                 forecastDateString + '_' + forecastModel + '.txt',
                 blob,
@@ -340,11 +345,11 @@
         display: flex;
         flex-direction: column;
         padding: 10px;
-        background-color: ivory;
+        background-color: #f8f8f8;
         text-align: center;
         th {
             color: black; /* Sets the text color of headers to black */
-            background-color: #f0f0f0; /* Optional: sets a light gray background for better contrast */
+            background-color: #e5e5e5; /* Optional: sets a light gray background for better contrast */
         }
         td {
             text-align: right;
@@ -360,13 +365,13 @@
             width: 100%; // Ensures the table takes the full width of its container
         }
         .green-text {
-            color: green;
+            color: #026f00;
         } /* Dark green */
         .yellow-text {
             color: #daa520;
         }
         .red-text {
-            color: red;
+            color: #c42f2f;
         } /* Firebrick red */
         .blue-text {
             color: blue;

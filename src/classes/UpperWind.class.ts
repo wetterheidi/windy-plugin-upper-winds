@@ -45,8 +45,8 @@ export class UpperWind {
         return this._elevation;
     }
 
-     /** Return step */
-     get step() {
+    /** Return step */
+    get step() {
         return this._step;
     }
 
@@ -68,7 +68,7 @@ export class UpperWind {
     get model() {
         return this._model;
     }
-    
+
     restratify() {
         if (this._rawdata.length) {
             this._flightLevels = this.stratify(this._rawdata);
@@ -84,7 +84,7 @@ export class UpperWind {
             const locationObject = await reverseName.get({ lat: ev.lat, lon: ev.lon }); // Retrieve the location data
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
-            this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data
+            //this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data from API
             //this._step = 500; // set height increment to interpolate
             this.findNearestColumn(weatherData.data.data.hours);
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
@@ -128,6 +128,10 @@ export class UpperWind {
      */
     private updateWeatherStats = (weatherData: MeteogramDataPayload) => {
         this._rawdata = []; // Array to store data for each layer
+        this._elevation = weatherData.header.elevation; //Pick elevation from windy API
+        // console.log('_____________' , JSON.stringify(weatherData.header)); //Code to find out the structure of weatherData.header
+        console.log('Height from MeteogramDataPayload: ' + weatherData.header.elevation);
+
 
         // Loop over all properties in weatherData.data.data
         for (const key in weatherData.data) {
@@ -198,7 +202,7 @@ export class UpperWind {
         if (endHeight < 0) {
             endHeight = 0;
         }
-       
+
         // Avoiding NaN in pressure values greater then 1000 hPa
         if (isNaN(data[data.length - 1].pressure)) {
             //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
@@ -255,7 +259,7 @@ export class UpperWind {
             upper.heightAGL,
             lower.heightAGL,
             ratio,
-        ) / 10 ) * 10; //Round to 10 to avoid rounding errors
+        ) / 10) * 10; //Round to 10 to avoid rounding errors
 
         const temperature = Utility.linearInterpolation(
             upper.temperature,
