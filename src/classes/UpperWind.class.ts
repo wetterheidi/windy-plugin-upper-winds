@@ -69,6 +69,14 @@ export class UpperWind {
         return this._model;
     }
     
+    restratify() {
+        if (this._rawdata.length) {
+            this._flightLevels = this.stratify(this._rawdata);
+            return this._flightLevels;
+        }
+        return undefined;
+    }
+
     /** Handle the click event (The request for the upper wind analysis) */
     async handleEvent(ev: { lat: any; lon: any }) {
         try {
@@ -247,7 +255,7 @@ export class UpperWind {
             upper.heightAGL,
             lower.heightAGL,
             ratio,
-        )/10)*10; //Round to 10 to avoid rounding errors
+        ) / 10 ) * 10; //Round to 10 to avoid rounding errors
 
         const temperature = Utility.linearInterpolation(
             upper.temperature,

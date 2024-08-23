@@ -10,27 +10,7 @@
     </div>
 
     {#if !ready}
-        <div>
-            <h4>
-                <strong>Settings: </strong><br />
-                <h4>
-                    <div class="mb-3">
-                        <label for="" class="form-label">Choose interpolation step: </label>
-                        <select bind:value={settings.increment} class="from-select">
-                            <option value="" disabled>-- Select Increment --</option>
-                            {#each incrementquestions as incrementquestion}
-                                <option value={incrementquestion.text}
-                                    >{incrementquestion.text}</option
-                                >
-                            {/each}
-                        </select>
-                        <label for="" class="form-label">{altitudeUnit} </label>
-                    </div>
-                </h4>
-            </h4>
-        </div>
-        <hr />
-        <h4><strong>Click on map to generate an upper wind table</strong></h4>
+               <h4><strong>Click on map to generate an upper wind table</strong></h4>
     {:else}
         <h4>
             <strong>Location: </strong><br />
@@ -93,6 +73,26 @@
             </table>
         </div>
         <hr />
+        <div>
+            <h4>
+                <strong>Settings: </strong><br />
+                <h4>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Choose interpolation step: </label>
+                        <select bind:value={settings.increment} class="from-select">
+                            <option value="" disabled>-- Select Increment --</option>
+                            {#each incrementquestions as incrementquestion}
+                                <option value={incrementquestion.text}
+                                    >{incrementquestion.text}</option
+                                >
+                            {/each}
+                        </select>
+                        <label for="" class="form-label">{altitudeUnit} </label>
+                    </div>
+                </h4>
+            </h4>
+        </div>
+        <hr />
         <div style="text-align:center">
             <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
             <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
@@ -114,7 +114,6 @@
     import { mkConfig, generateCsv, asBlob } from 'export-to-csv';
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
     import { Utility } from './classes//Utility.class';
-    import metrics from '@windy/metrics';
 
     enum Format {
         FMT_CSV = 1,
@@ -165,6 +164,10 @@
     $: {
         console.log('----> Step set to: ', settings.increment);
         upperwind._step = Number(settings.increment);
+        const fl = upperwind.restratify();
+        if (fl) {
+            flightLevels = fl;
+        }
     }
 
     /* Add layer for lines to the map*/
@@ -307,17 +310,8 @@
             ];
 
             let headerLine1 = ['p', 'hAMSL', 'hAGL', 'T', 'Td', 'u', 'v', 'Dir', 'Spd'];
-            let headerLine2 = [
-                'hPa',
-                altitudeUnit,
-                altitudeUnit,
-                temperatureUnit,
-                temperatureUnit,
-                'm/s',
-                'm/s',
-                'deg',
-                windUnit,
-            ];
+            let headerLine2 = ['hPa', altitudeUnit, altitudeUnit, temperatureUnit, temperatureUnit, 'm/s', 'm/s', 'deg', windUnit,];
+
 
             const lineSeparator = `\n`;
             const fieldSeparator = ' ';
@@ -329,6 +323,8 @@
             };
 
             const data = flightLevels.map(rowConverter).join(lineSeparator);
+
+
             const blob = new Blob([data], { type: 'text/plain' });
             saveTemplateAsFile(
                 forecastDateString + '_' + forecastModel + '.txt',
