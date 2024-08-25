@@ -90,8 +90,6 @@ export class UpperWind {
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
-
-            console.log('step in upperwinds: ' + this._step);
         } catch (error) {
             console.error('* * * An error occurred:', error);
         }
@@ -207,10 +205,10 @@ export class UpperWind {
         if (isNaN(data[data.length - 1].pressure)) {
             //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
             data[data.length - 1].pressure = Utility.calculatePressure((data[data.length - 2].pressure), (data[data.length - 2].height));
-            //console.log('berechneter Druck: ' + data[data.length - 1].pressure);
+            //console.log('calculated pressure: ' + data[data.length - 1].pressure);
         } else if (isNaN(data[data.length - 2].pressure)) {
             data[data.length - 2].pressure = Utility.calculatePressure((data[data.length - 3].pressure), (data[data.length - 3].height));
-            //console.log('berechneter Druck: ' + data[data.length - 2].pressure);
+            //console.log('calculated pressure: ' + data[data.length - 2].pressure);
         }
 
         let previousHuman = '';

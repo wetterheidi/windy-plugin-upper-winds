@@ -147,9 +147,8 @@
         { text: '2000' },
     ];
 
-    //Hier wird die Höheneinheit gesetzt. Wie jetzt weiter?
+    //Set increment for interpolation
     $: {
-        console.log('----> Step set to: ', settings.increment);
         upperwind._step = Number(settings.increment);
         const fl = upperwind.restratify();
         if (fl) {
@@ -179,6 +178,7 @@
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
+    };
 
     const listener = () => {
         console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
