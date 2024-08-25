@@ -10,7 +10,7 @@
     </div>
 
     {#if !ready}
-               <h4><strong>Click on map to generate an upper wind table</strong></h4>
+        <h4><strong>Click on map to generate an upper wind table</strong></h4>
     {:else}
         <h4>
             <strong>Location: </strong><br />
@@ -167,25 +167,18 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-
+        bcast.emit('pluginOpened', _params);
         popup
             .setLatLng([_params.lat, _params.lon])
             .setContent('Loading....')
             .addTo(activeLayer)
             .openOn(map);
-        bcast.on('pluginOpened', async () => {
-            upperwind.setTime(windyStore.get('timestamp'));
-            await upperwind.handleEvent(_params); // Wait for handleEvent to complete
-            assignAnalysis(upperwind);
-            popup.setContent(clickLocation);
-        });
+
         bcast.on('paramsChanged', async () => {
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
-        
-    };
 
     const listener = () => {
         console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
@@ -194,6 +187,7 @@
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
+
         singleclick.on('windy-plugin-upper-winds', async ev => {
             position = { lat: ev.lat, lon: ev.lon };
             /* Create a Popup to show the clicked position*/
@@ -206,6 +200,13 @@
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
         });
+        bcast.on('pluginOpened', async () => {
+            if (position === undefined) return;
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(position); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+            popup.setContent(clickLocation);
+        });
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
             if (position === undefined) return;
@@ -213,10 +214,16 @@
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
+        bcast.on('pluginClosed', async () => {
+            popup.closePopup();
+        });
     });
 
     onDestroy(() => {
         bcast.off('redrawFinished', listener);
+        bcast.off('paramsChanged');
+        bcast.off('pluginOpened');
+        popup.closePopup();
         popup.remove();
     });
 
@@ -247,11 +254,11 @@
         display: flex;
         flex-direction: column;
         padding: 10px;
-        background-color: ivory;
+        background-color: #f8f8f8;
         text-align: center;
         th {
             color: black; /* Sets the text color of headers to black */
-            background-color: #f0f0f0; /* Optional: sets a light gray background for better contrast */
+            background-color: #e5e5e5; /* Optional: sets a light gray background for better contrast */
         }
         td {
             text-align: right;
@@ -267,13 +274,13 @@
             width: 100%; // Ensures the table takes the full width of its container
         }
         .green-text {
-            color: green;
+            color: #026f00;
         } /* Dark green */
         .yellow-text {
             color: #daa520;
         }
         .red-text {
-            color: red;
+            color: #c42f2f;
         } /* Firebrick red */
         .blue-text {
             color: blue;
@@ -308,5 +315,12 @@
 
     .nav-links a:hover {
         text-decoration: underline;
+    }
+
+    /* css to customize Leaflet default styles  */
+    .popupCustom .leaflet-popup-tip,
+    .popupCustom .leaflet-popup-content-wrapper {
+        background: #e0e0e0;
+        color: #234c5e;
     }
 </style>
