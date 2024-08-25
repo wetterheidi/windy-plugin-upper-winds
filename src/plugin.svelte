@@ -180,24 +180,18 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-
+        bcast.emit('pluginOpened', _params);
         popup
             .setLatLng([_params.lat, _params.lon])
             .setContent('Loading....')
             .addTo(activeLayer)
             .openOn(map);
-        bcast.on('pluginOpened', async () => {
-            upperwind.setTime(windyStore.get('timestamp'));
-            await upperwind.handleEvent(_params); // Wait for handleEvent to complete
-            assignAnalysis(upperwind);
-            popup.setContent(clickLocation);
-        });
+
         bcast.on('paramsChanged', async () => {
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
-    };
 
     const listener = () => {
         console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
@@ -206,6 +200,7 @@
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
+
         singleclick.on('windy-plugin-upper-winds', async ev => {
             position = { lat: ev.lat, lon: ev.lon };
             /* Create a Popup to show the clicked position*/
@@ -218,6 +213,13 @@
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
         });
+        bcast.on('pluginOpened', async () => {
+            if (position === undefined) return;
+            upperwind.setTime(windyStore.get('timestamp'));
+            await upperwind.handleEvent(position); // Wait for handleEvent to complete
+            assignAnalysis(upperwind);
+            popup.setContent(clickLocation);
+        });
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
             if (position === undefined) return;
@@ -225,10 +227,16 @@
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
         });
+        bcast.on('pluginClosed', async () => {
+            popup.closePopup();
+        });
     });
 
     onDestroy(() => {
         bcast.off('redrawFinished', listener);
+        bcast.off('paramsChanged');
+        bcast.off('pluginOpened');
+        popup.closePopup();
         popup.remove();
     });
 
@@ -252,6 +260,7 @@
             (upperwind.elevation * 3.28084).toFixed(0) + ' ft/ ' + upperwind.elevation + ' m';
         ready = true;
     }
+
 
     /** Download the Data  */
     // https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
@@ -406,5 +415,12 @@
 
     .nav-links a:hover {
         text-decoration: underline;
+    }
+
+    /* css to customize Leaflet default styles  */
+    .popupCustom .leaflet-popup-tip,
+    .popupCustom .leaflet-popup-content-wrapper {
+        background: #e0e0e0;
+        color: #234c5e;
     }
 </style>
