@@ -43,7 +43,7 @@
                         <th>RHw</th>
                     </tr>
                     <tr>
-                        <th>{altitudeUnit} <br />AGL</th>
+                        <th>{altitudeUnit} <br />{settings.referenceLevel}</th>
                         <th>°</th>
                         <th>{windUnit}</th>
                         <th>hPa</th>
@@ -53,14 +53,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each flightLevels as { heightAGL, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
+                    {#each flightLevels as { heightAGL, height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
                         <tr
                             class:green-text={temperature > freezingLevelAt - 0.5 &&
                                 temperature < freezingLevelAt + 0.5}
                             class:blue-text={temperature <= freezingLevelAt - 0.5}
                             class:red-text={temperature >= freezingLevelAt + 0.5}
                         >
-                            <td>{heightAGL}</td>
+                            {#if settings.referenceLevel == 'AGL'}
+                                <td>{heightAGL}</td>
+                            {:else}
+                                <td>{height}</td>
+                            {/if}
                             <td>{windDir}</td>
                             <td>{windSp}</td>
                             <td>{pressure}</td>
@@ -88,6 +92,19 @@
                             {/each}
                         </select>
                         <label for="" class="form-label">{altitudeUnit} </label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="" class="form-label"
+                            >Choose reference level for altitude:
+                        </label>
+                        <select bind:value={settings.referenceLevel} class="from-select">
+                            <option value="" disabled>-- Select Reference --</option>
+                            {#each referencelevelquestions as referencelevelquestions}
+                                <option value={referencelevelquestions.text}
+                                    >{referencelevelquestions.text}</option
+                                >
+                            {/each}
+                        </select>
                     </div>
                 </h4>
             </h4>
@@ -137,6 +154,7 @@
 
     let settings = {
         increment: '500',
+        referenceLevel: 'AGL',
     };
 
     let incrementquestions = [
@@ -147,9 +165,19 @@
         { text: '2000' },
     ];
 
-    //Set increment for interpolation
+    let referencelevelquestions = [{ text: 'AGL' }, { text: 'AMSL' }];
+
+    //On settings changed, recalculate upper winds table
     $: {
         upperwind._step = Number(settings.increment);
+        const fl = upperwind.restratify();
+        if (fl) {
+            flightLevels = fl;
+        }
+    }
+    $: {
+        console.log('----> Reference level set to: ', settings.referenceLevel);
+        upperwind._reference = settings.referenceLevel;
         const fl = upperwind.restratify();
         if (fl) {
             flightLevels = fl;
@@ -273,6 +301,7 @@
         table {
             width: 100%; // Ensures the table takes the full width of its container
         }
+
         .green-text {
             color: #026f00;
         } /* Dark green */
@@ -288,6 +317,25 @@
         .black-text {
             color: black;
         }
+    }
+
+    select {
+        background-color: #6b6b6b;
+        border: none;
+        padding: 0 1em 0 0;
+        margin: 0;
+        width: 80px;
+        color: #ffe3a1;
+        border-radius: 3px;
+    }
+
+    button {
+        background-color: #6b6b6b;
+        border: none;
+        color: #ffe3a1;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 3px;
     }
 
     .nav-links {
