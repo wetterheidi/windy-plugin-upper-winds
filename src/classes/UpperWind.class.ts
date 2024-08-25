@@ -30,6 +30,8 @@ export class UpperWind {
     private _elevation = 0;
     /** Step (i.e. height increment to interpolate) */
     public _step = 0;
+    /** Reference level for altitude */
+    public _reference = 'AGL';
 
 
     setTime(t: number) {
@@ -67,6 +69,10 @@ export class UpperWind {
 
     get model() {
         return this._model;
+    }
+
+    get reference() {
+        return this._reference;
     }
 
     restratify() {
@@ -185,6 +191,8 @@ export class UpperWind {
 
     private stratify(data: Sounding[]) {
         const result = [];
+        let startHeight: number = 0;
+        let endHeight: number = 0;
 
         // Determine factor for height conversion depending on user settings
         let mInFtFactor: number = 1;
@@ -194,15 +202,27 @@ export class UpperWind {
             mInFtFactor = 1;
         }
         // Define the range of heights for interpolation
-        // Define start height so that AGL is rounded according to the "step"
-        const startHeight = (Math.floor((data[0].height - this.elevation * mInFtFactor) / this.step) * this.step + (this.elevation * mInFtFactor)); // Highest point (AMSL)
-        // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
-        let endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step / 2)) * (this.step / 2) - (this.step / 2);
-        console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
-        if (endHeight < 0) {
-            endHeight = 0;
+        if (this.reference == 'AGL') {
+            console.log('Reference level set to: ' + this.reference);
+            // Define start height so that AGL is rounded according to the "step"
+            startHeight = (Math.floor((data[0].height - this.elevation * mInFtFactor) / this.step) * this.step + (this.elevation * mInFtFactor)); // Highest point (AMSL)
+            // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
+            endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step / 2)) * (this.step / 2) - (this.step / 2);
+            console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
+            if (endHeight < 0) {
+                endHeight = 0;
+            }
+        } else if (this.reference == 'AMSL') {
+            console.log('im else if: ' + this.reference);
+            console.log('Reference level set to: ' + this.reference);
+            startHeight = Math.floor(data[0].height / this.step) * this.step; // Highest point (AMSL)
+            console.log(data[0].height + ' Starthöhe ' + startHeight + ' Step ' +this.step);
+            // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
+            endHeight = Math.ceil((data[data.length - 1].height+ this.elevation * mInFtFactor)/ (this.step )) * (this.step );
+            if (endHeight < 0) {
+                endHeight = 0;
+            }
         }
-
         // Avoiding NaN in pressure values greater then 1000 hPa
         if (isNaN(data[data.length - 1].pressure)) {
             //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
