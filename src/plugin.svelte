@@ -113,7 +113,9 @@
         <div style="text-align:center">
             <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
             <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
+            <h4></h4>
             <button on:click={() => downloadData(Format.FMT_HEIDIS)}> Download HEIDIS </button>
+            <button on:click={() => downloadData(Format.FMT_ATAK)}> Download ATAK </button>
         </div>
     {/if}
     <hr />
@@ -132,11 +134,12 @@
     import { LatLon } from '@windycom/plugin-devtools/types/interfaces';
     import { Utility } from './classes//Utility.class';
 
-    enum Format {
-        FMT_CSV = 1,
-        FMT_JSON,
-        FMT_HEIDIS,
-    }
+    const Format = {
+        FMT_CSV: 1,
+        FMT_JSON: 2,
+        FMT_HEIDIS: 3,
+        FMT_ATAK: 4,
+    };
     let ready = false;
     let flightLevels: any[] = [];
     let clickLocation = '';
@@ -300,7 +303,7 @@
         link.remove();
     };
 
-    function downloadData(format: Format) {
+    function downloadData(format: any) {
         if (format === Format.FMT_CSV) {
             const csvConfig = mkConfig({
                 useKeysAsHeaders: true,
@@ -347,6 +350,54 @@
             };
 
             const data = flightLevels.map(rowConverter).join(lineSeparator);
+            const columnNames =
+                sequence
+                    .map(fd => fd.header + fieldSeparator)
+                    .join('')
+                    .slice(0, -1) + lineSeparator;
+            const units =
+                sequence
+                    .map(fd => fd.unit + fieldSeparator)
+                    .join('')
+                    .slice(0, -1) + lineSeparator;
+
+            const blob = new Blob([columnNames + units + data], { type: 'text/plain' });
+            saveTemplateAsFile(
+                forecastDateString + '_' + forecastModel + '.txt',
+                blob,
+                'text/plain',
+            );
+        }
+        if (format === Format.FMT_ATAK) {
+            // which keys to extract into columns, by field order
+
+            if (
+                altitudeUnit == 'm' ||
+                settings.referenceLevel == 'AMSL' ||
+                settings.increment != '1000'
+            ) {
+                alert(
+                    'You have to change altitude unit to feet,\n the reference level to AGL and \n the interpolation step to 1000 \n before downloading ATAK files!',
+                );
+                return;
+            }
+
+            const sequence = [
+                { key: 'heightAGL', header: 'Alt', unit: altitudeUnit+'AGL' },
+                { key: 'windDir', header: 'Dir', unit: '' },
+                { key: 'windSp', header: 'Spd', unit: ''},
+            ];
+
+            const lineSeparator = `\n`;
+            const fieldSeparator = '\t';
+            const rowConverter = (row: any) => {
+                return sequence
+                    .map(field => `${row[field.key]}` + fieldSeparator)
+                    .join('')
+                    .slice(0, -1);
+            };
+
+            const data = flightLevels.slice().reverse().map(rowConverter).join(lineSeparator);
             const columnNames =
                 sequence
                     .map(fd => fd.header + fieldSeparator)
