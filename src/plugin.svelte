@@ -260,6 +260,9 @@
 
     onDestroy(() => {
         bcast.off('redrawFinished', listener);
+        bcast.off('paramsChanged');
+        bcast.off('pluginOpened');
+        singleclick.off;
         popup.remove();
     });
 
@@ -383,9 +386,9 @@
             }
 
             const sequence = [
-                { key: 'heightAGL', header: 'Alt', unit: altitudeUnit+'AGL' },
+                { key: 'heightAGL', header: 'Alt', unit: altitudeUnit + 'AGL' },
                 { key: 'windDir', header: 'Dir', unit: '' },
-                { key: 'windSp', header: 'Spd', unit: ''},
+                { key: 'windSp', header: 'Spd', unit: '' },
             ];
 
             const lineSeparator = `\n`;
