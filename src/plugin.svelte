@@ -170,13 +170,6 @@
     //On settings changed, recalculate upper winds table
     $: {
         upperwind._step = Number(settings.increment);
-        const fl = upperwind.restratify();
-        if (fl) {
-            flightLevels = fl;
-        }
-    }
-    $: {
-        console.log('----> Reference level set to: ', settings.referenceLevel);
         upperwind._reference = settings.referenceLevel;
         const fl = upperwind.restratify();
         if (fl) {
@@ -190,6 +183,8 @@
 
     activeLayer.clearLayers();
 
+    let opened: boolean = false;
+
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
             return; // Ignore null _params and do not execute further
@@ -201,22 +196,26 @@
             .addTo(activeLayer)
             .openOn(map);
 
-        bcast.on('paramsChanged', async () => {
+        if (opened == true) {
+            return; //Check if plugin is opened already to avoid double calculations
+        }
+
+        bcast.on('pluginOpened', async () => {
+            //console.log('In onopen pluginOpened');
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
+            popup.setContent(clickLocation);
         });
-    };
 
-    const listener = () => {
-        console.log('---redrawFinished', new Date(windyStore.get('timestamp')));
-        assignAnalysis(upperwind);
+        opened = true; //Plugin is opened now
     };
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
 
         singleclick.on('windy-plugin-upper-winds', async ev => {
+            //console.log('In onMount singleclick');
             position = { lat: ev.lat, lon: ev.lon };
             /* Create a Popup to show the clicked position*/
             popup
@@ -237,6 +236,7 @@
         });
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
+            //console.log('In onMount paramsChanged');
             if (position === undefined) return;
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
@@ -248,11 +248,13 @@
     });
 
     onDestroy(() => {
-        bcast.off('redrawFinished', listener);
+        console.log('Im onDestroy');
+        popup.remove();
         bcast.off('paramsChanged');
         bcast.off('pluginOpened');
-        popup.closePopup();
-        popup.remove();
+        singleclick.off;
+        map.removeControl(bcast);
+        opened = true;
     });
 
     /* Assigns the Analysis to a location and a model*/
