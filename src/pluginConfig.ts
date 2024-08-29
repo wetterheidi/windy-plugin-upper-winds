@@ -2,7 +2,7 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-upper-winds',
-    version: '0.0.8',
+    version: '0.0.9',
     icon: '🪂',
     title: 'Upper winds',
     description: 'Show upper winds, temperature and humidity at a given position',
@@ -13,7 +13,7 @@ const config: ExternalPluginConfig = {
     routerPath: '/upper-winds',
     desktopWidth: 500,
     listenToSingleclick: true,
-    addToContextmenu: false,
+    addToContextmenu: true,
     private: false
 };
 
