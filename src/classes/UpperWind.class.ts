@@ -96,8 +96,6 @@ export class UpperWind {
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
-
-            console.log('step in upperwinds: ' + this._step);
         } catch (error) {
             console.error('* * * An error occurred:', error);
         }
@@ -136,8 +134,6 @@ export class UpperWind {
         this._rawdata = []; // Array to store data for each layer
         this._elevation = weatherData.header.elevation; //Pick elevation from windy API
         // console.log('_____________' , JSON.stringify(weatherData.header)); //Code to find out the structure of weatherData.header
-        console.log('Height from MeteogramDataPayload: ' + weatherData.header.elevation);
-
 
         // Loop over all properties in weatherData.data.data
         for (const key in weatherData.data) {
@@ -203,20 +199,16 @@ export class UpperWind {
         }
         // Define the range of heights for interpolation
         if (this.reference == 'AGL') {
-            console.log('Reference level set to: ' + this.reference);
             // Define start height so that AGL is rounded according to the "step"
             startHeight = (Math.floor((data[0].height - this.elevation * mInFtFactor) / this.step) * this.step + (this.elevation * mInFtFactor)); // Highest point (AMSL)
             // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
             endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step / 2)) * (this.step / 2) - (this.step / 2);
-            console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
+            //console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
             if (endHeight < 0) {
                 endHeight = 0;
             }
         } else if (this.reference == 'AMSL') {
-            console.log('im else if: ' + this.reference);
-            console.log('Reference level set to: ' + this.reference);
             startHeight = Math.floor(data[0].height / this.step) * this.step; // Highest point (AMSL)
-            console.log(data[0].height + ' Starthöhe ' + startHeight + ' Step ' +this.step);
             // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
             endHeight = Math.ceil((data[data.length - 1].height+ this.elevation * mInFtFactor)/ (this.step )) * (this.step );
             if (endHeight < 0) {
