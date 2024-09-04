@@ -109,6 +109,31 @@
                 </h4>
             </h4>
         </div>
+        <hr />
+        <div>
+            <h4>
+                <strong>Calculate mean wind between: </strong><br />
+                <h4>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Lower altitude: </label>
+                        <input type="text" bind:value={lowerAltitudeInput} />
+                        <label for="" class="form-label"
+                            >{altitudeUnit} {settings.referenceLevel}</label
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Upper altitude: </label>
+                        <input type="text" bind:value={upperAltitudeInput} />
+                        <label for="" class="form-label"
+                            >{altitudeUnit} {settings.referenceLevel}</label
+                        >
+                    </div>
+                </h4>
+                <div class="mb-3">
+                    <strong>Mean wind: {meanWindDirection}° {meanWindSpeed} {windUnit}</strong>
+                </div>
+            </h4>
+        </div>
     {/if}
     <hr />
 </section>
