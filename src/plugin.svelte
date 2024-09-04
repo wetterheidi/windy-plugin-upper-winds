@@ -230,30 +230,30 @@
                 heightAGLArray,
                 wind_uArray,
                 wind_vArray,
-                upperwind._lowerLevel,
-                upperwind._upperLevel,
+                Number(upperwind._lowerLevel),
+                Number(upperwind._upperLevel),
             )[0];
             meanWindSpeed = Utility.Mittelwind(
                 heightAGLArray,
                 wind_uArray,
                 wind_vArray,
-                upperwind._lowerLevel,
-                upperwind._upperLevel,
+                Number(upperwind._lowerLevel),
+                Number(upperwind._upperLevel),
             )[1];
         } else if (settings.referenceLevel == 'AMSL') {
             meanWindDirection = Utility.Mittelwind(
                 heightMSLArray,
                 wind_uArray,
                 wind_vArray,
-                upperwind._lowerLevel,
-                upperwind._upperLevel,
+                Number(upperwind._lowerLevel),
+                Number(upperwind._upperLevel),
             )[0];
             meanWindSpeed = Utility.Mittelwind(
                 heightMSLArray,
                 wind_uArray,
                 wind_vArray,
-                upperwind._lowerLevel,
-                upperwind._upperLevel,
+                Number(upperwind._lowerLevel),
+                Number(upperwind._upperLevel),
             )[1];
         }
         

@@ -180,15 +180,15 @@ export class Utility {
 
     const dddff: number[] = new Array(4);
 
-    let xObergrenze: number, yObergrenze: number, xUntergrenze: number, yUntergrenze: number;
+    //const xObergrenze: number, yObergrenze: number, xUntergrenze: number, yUntergrenze: number;
     let h: number, x: number, y: number;
     const hSchicht: number[] = [Obergrenze];
 
     // Interpolate values at the upper and lower limits of the layer
-    xObergrenze = Utility.LIP(Höhe, xKomponente, Obergrenze);
-    yObergrenze = Utility.LIP(Höhe, yKomponente, Obergrenze);
-    xUntergrenze = Utility.LIP(Höhe, xKomponente, Untergrenze);
-    yUntergrenze = Utility.LIP(Höhe, yKomponente, Untergrenze);
+    const xObergrenze: number = Number(Utility.LIP(Höhe, xKomponente, Obergrenze));
+    const yObergrenze: number = Number(Utility.LIP(Höhe, yKomponente, Obergrenze));
+    const xUntergrenze: number = Number(Utility.LIP(Höhe, xKomponente, Untergrenze));
+    const yUntergrenze: number = Number(Utility.LIP(Höhe, yKomponente, Untergrenze));
 
     const xSchicht: number[] = [xObergrenze];
     const ySchicht: number[] = [yObergrenze];
