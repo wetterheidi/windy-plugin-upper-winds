@@ -74,7 +74,7 @@ export class Utility {
     //https://chatgpt.com/share/141edd4b-8987-444f-8cb8-e7f5cbb0f001
     const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`);
     const data = await response.json();
-  
+
     return data.results[0].elevation;
   }
 
@@ -130,5 +130,111 @@ export class Utility {
     }
     return unitALtitude;
   }
+
+  static LIP(xVector: number[], yVector: number[], xValue: number): number | string {
+    // interpolate using a vector array
+    let Dimension: number = 0;
+    let m: number = 0;
+    let n: number = 0;
+    let i: number = 0;
+    let reversed: boolean = false;
+
+    if (xVector[1] > xVector[0]) {
+      yVector.reverse();
+      xVector.reverse();
+      reversed = true;
+    }
+
+    Dimension = xVector.length - 1;
+    try {
+      if (xValue > xVector[0] || xValue < xVector[Dimension]) {
+        if (xValue > xVector[0]) {
+          m = (yVector[1] - yVector[0]) / (xVector[1] - xVector[0]);
+          n = yVector[1] - m * xVector[1];
+        } else {
+          m = (yVector[Dimension] - yVector[Dimension - 1]) / (xVector[Dimension] - xVector[Dimension - 1]);
+          n = yVector[Dimension] - m * xVector[Dimension];
+        }
+        return m * xValue + n;
+      } else {
+        for (i = 1; i <= Dimension; i++) {
+          if (xValue >= xVector[i]) { break; }
+        }
+
+        m = (yVector[i] - yVector[i - 1]) / (xVector[i] - xVector[i - 1]);
+        n = yVector[i] - m * xVector[i];
+        return m * xValue + n;
+      }
+    } catch (error) {
+      return "interpolation error";
+    } finally {
+      if (reversed) {
+        yVector.reverse();
+        xVector.reverse();
+      }
+    }
+  }
+
+  static Mittelwind(Höhe: number[], xKomponente: number[], yKomponente: number[], Untergrenze: number, Obergrenze: number): number[] {
+    //calculate mean winds using trapezoid formula
+
+    const dddff: number[] = new Array(4);
+
+    let xObergrenze: number, yObergrenze: number, xUntergrenze: number, yUntergrenze: number;
+    let h: number, x: number, y: number;
+    const hSchicht: number[] = [Obergrenze];
+
+    // Interpolate values at the upper and lower limits of the layer
+    xObergrenze = Utility.LIP(Höhe, xKomponente, Obergrenze);
+    yObergrenze = Utility.LIP(Höhe, yKomponente, Obergrenze);
+    xUntergrenze = Utility.LIP(Höhe, xKomponente, Untergrenze);
+    yUntergrenze = Utility.LIP(Höhe, yKomponente, Untergrenze);
+
+    const xSchicht: number[] = [xObergrenze];
+    const ySchicht: number[] = [yObergrenze];
+
+    for (let i = 0; i < Höhe.length; i++) {
+      if (Höhe[i] < Obergrenze && Höhe[i] > Untergrenze) {
+        h = Höhe[i];
+        x = xKomponente[i];
+        y = yKomponente[i];
+
+        hSchicht.push(h);
+        xSchicht.push(x);
+        ySchicht.push(y);
+      }
+    }
+
+    hSchicht.push(Untergrenze);
+    xSchicht.push(xUntergrenze);
+    ySchicht.push(yUntergrenze);
+
+    // Calculate average x and y components
+    let xTrapez: number = 0;
+    let yTrapez: number = 0;
+
+    for (let i = 0; i < hSchicht.length - 1; i++) {
+      xTrapez += 0.5 * (xSchicht[i] + xSchicht[i + 1]) * (hSchicht[i] - hSchicht[i + 1]);
+      yTrapez += 0.5 * (ySchicht[i] + ySchicht[i + 1]) * (hSchicht[i] - hSchicht[i + 1]);
+    }
+    const xMittel: number = xTrapez / (hSchicht[0] - hSchicht[hSchicht.length - 1]);
+    const yMittel: number = yTrapez / (hSchicht[0] - hSchicht[hSchicht.length - 1]);
+
+    dddff[2] = xMittel;
+    dddff[3] = yMittel;
+
+    // Determine average wind direction and speed in the layer
+    dddff[1] = Utility.windSpeed(xMittel, yMittel);
+
+    dddff[0] = Utility.windDirection(xMittel, yMittel);
+
+    //dddff(0) Mittelwindrichtung
+    //dddff(1) Mittelwindgeschwindigkeit
+    //dddff(2) = xMittel
+    //dddff(3) = yMittel
+    
+    return dddff;
+  }
+
 
 }
