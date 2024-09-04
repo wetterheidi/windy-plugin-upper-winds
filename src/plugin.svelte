@@ -110,6 +110,32 @@
             </h4>
         </div>
         <hr />
+        <div>
+            <h4>
+                <strong>Calculate mean wind between: </strong><br />
+                <h4>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Lower altitude: </label>
+                        <input type="text" bind:value={lowerAltitudeInput} />
+                        <label for="" class="form-label"
+                            >{altitudeUnit} {settings.referenceLevel}</label
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Upper altitude: </label>
+                        <input type="text" bind:value={upperAltitudeInput} />
+                        <label for="" class="form-label"
+                            >{altitudeUnit} {settings.referenceLevel}</label
+                        >
+                    </div>
+                </h4>
+                <div class="mb-3">
+                    <strong>Mean wind: {meanWindDirection}° {meanWindSpeed} {windUnit}</strong>
+                </div>
+            </h4>
+        </div>
+        <hr />
+
         <div style="text-align:center">
             <button on:click={() => downloadData(Format.FMT_CSV)}> Download CSV </button>
             <button on:click={() => downloadData(Format.FMT_JSON)}> Download JSON </button>
@@ -149,6 +175,8 @@
     let forecastModel = '';
     let elevation: any;
     let position: LatLon | undefined = undefined;
+    let meanWindDirection: number;
+        let meanWindSpeed: number;
 
     const { title } = config;
     const { version } = config;
@@ -183,8 +211,53 @@
 
     let referencelevelquestions = [{ text: 'AGL' }, { text: 'AMSL' }];
 
+    let lowerAltitudeInput: string = '0';
+    let upperAltitudeInput: string = '3000';
+
     //On settings changed, recalculate upper winds table
     $: {
+        upperwind._lowerLevel = lowerAltitudeInput;
+        upperwind._upperLevel = upperAltitudeInput;
+
+        /* create Arrays for mean winds*/
+        const heightAGLArray = flightLevels.map(row => row.heightAGL);
+        const heightMSLArray = flightLevels.map(row => row.height);
+        const wind_uArray = flightLevels.map(row => row.wind_u);
+        const wind_vArray = flightLevels.map(row => row.wind_v);
+       
+        if (settings.referenceLevel == 'AGL') {
+            meanWindDirection = Utility.Mittelwind(
+                heightAGLArray,
+                wind_uArray,
+                wind_vArray,
+                upperwind._lowerLevel,
+                upperwind._upperLevel,
+            )[0];
+            meanWindSpeed = Utility.Mittelwind(
+                heightAGLArray,
+                wind_uArray,
+                wind_vArray,
+                upperwind._lowerLevel,
+                upperwind._upperLevel,
+            )[1];
+        } else if (settings.referenceLevel == 'AMSL') {
+            meanWindDirection = Utility.Mittelwind(
+                heightMSLArray,
+                wind_uArray,
+                wind_vArray,
+                upperwind._lowerLevel,
+                upperwind._upperLevel,
+            )[0];
+            meanWindSpeed = Utility.Mittelwind(
+                heightMSLArray,
+                wind_uArray,
+                wind_vArray,
+                upperwind._lowerLevel,
+                upperwind._upperLevel,
+            )[1];
+        }
+        
+        console.log('Unten: ' + upperwind._lowerLevel + ' Oben: ' + upperwind._upperLevel);
         upperwind._step = Number(settings.increment);
         upperwind._reference = settings.referenceLevel;
         const fl = upperwind.restratify();
@@ -199,38 +272,29 @@
 
     activeLayer.clearLayers();
 
-    let opened: boolean = false;
-
     export const onopen = async (_params: { lat: any; lon: any }) => {
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
 
-        popup
-            .setLatLng([_params.lat, _params.lon])
-            .setContent('Loading....')
-            .addTo(activeLayer)
-            .openOn(map);
-
-        if (opened == true) {
-            return; //Check if plugin is opened already to avoid double calculations
-        }
-
         bcast.on('pluginOpened', async () => {
-            //console.log('In onopen pluginOpened');
+            console.log('In onopen pluginOpened ');
+            popup
+                .setLatLng([_params.lat, _params.lon])
+                .setContent('Loading....')
+                .addTo(activeLayer)
+                .openOn(map);
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
         });
-
-        opened = true; //Plugin is opened now
     };
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
         singleclick.on('windy-plugin-upper-winds', async ev => {
-            //console.log('In onMount singleclick');
+            console.log('In onMount singleclick');
             position = { lat: ev.lat, lon: ev.lon };
             /* Create a Popup to show the clicked position*/
             popup
@@ -244,7 +308,7 @@
         });
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
-            //console.log('In onMount paramsChanged');
+            console.log('In onMount paramsChanged');
             if (position === undefined) return;
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
@@ -259,7 +323,6 @@
         bcast.off('pluginOpened');
         singleclick.off;
         map.removeControl(bcast);
-        opened = true;
     });
 
     /* Assigns the Analysis to a location and a model*/
@@ -461,6 +524,16 @@
     }
 
     select {
+        background-color: #6b6b6b;
+        border: none;
+        padding: 0 1em 0 0;
+        margin: 0;
+        width: 80px;
+        color: #ffe3a1;
+        border-radius: 3px;
+    }
+
+    input {
         background-color: #6b6b6b;
         border: none;
         padding: 0 1em 0 0;

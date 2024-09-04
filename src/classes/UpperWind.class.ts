@@ -32,7 +32,10 @@ export class UpperWind {
     public _step = 0;
     /** Reference level for altitude */
     public _reference = 'AGL';
-
+    /** Lower level for mean wind calculation */
+    public _lowerLevel: string = '0';
+    /** Upper level for mean wind calculation */
+    public _upperLevel: string = '3000';
 
     setTime(t: number) {
         this._timestamp = t;
@@ -40,6 +43,14 @@ export class UpperWind {
 
     get getTime() {
         return this._timestamp;
+    }
+
+    get lowerLevel() {
+        return this._lowerLevel;
+    }
+
+    get upperLevel() {
+        return this._upperLevel;
     }
 
     /** Return the final elevation */
@@ -210,7 +221,7 @@ export class UpperWind {
         } else if (this.reference == 'AMSL') {
             startHeight = Math.floor(data[0].height / this.step) * this.step; // Highest point (AMSL)
             // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
-            endHeight = Math.ceil((data[data.length - 1].height+ this.elevation * mInFtFactor)/ (this.step )) * (this.step );
+            endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step)) * (this.step);
             if (endHeight < 0) {
                 endHeight = 0;
             }
