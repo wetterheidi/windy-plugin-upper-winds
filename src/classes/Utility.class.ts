@@ -1,5 +1,7 @@
+import windyStore from '@windy/store';
 import metrics from '@windy/metrics';
 import { LocationDetails } from './Locationdetails.interface';
+
 
 export class Utility {
 
@@ -180,15 +182,15 @@ export class Utility {
 
     const dddff: number[] = new Array(4);
 
-    let xObergrenze: number, yObergrenze: number, xUntergrenze: number, yUntergrenze: number;
+    //const xObergrenze: number, yObergrenze: number, xUntergrenze: number, yUntergrenze: number;
     let h: number, x: number, y: number;
     const hSchicht: number[] = [Obergrenze];
 
     // Interpolate values at the upper and lower limits of the layer
-    xObergrenze = Utility.LIP(Höhe, xKomponente, Obergrenze);
-    yObergrenze = Utility.LIP(Höhe, yKomponente, Obergrenze);
-    xUntergrenze = Utility.LIP(Höhe, xKomponente, Untergrenze);
-    yUntergrenze = Utility.LIP(Höhe, yKomponente, Untergrenze);
+    const xObergrenze: number = Number(Utility.LIP(Höhe, xKomponente, Obergrenze));
+    const yObergrenze: number = Number(Utility.LIP(Höhe, yKomponente, Obergrenze));
+    const xUntergrenze: number = Number(Utility.LIP(Höhe, xKomponente, Untergrenze));
+    const yUntergrenze: number = Number(Utility.LIP(Höhe, yKomponente, Untergrenze));
 
     const xSchicht: number[] = [xObergrenze];
     const ySchicht: number[] = [yObergrenze];
@@ -232,9 +234,19 @@ export class Utility {
     //dddff(1) Mittelwindgeschwindigkeit
     //dddff(2) = xMittel
     //dddff(3) = yMittel
-    
+
     return dddff;
   }
 
+  static checkOverlay() {
+    /* Check overlay and change to wind overlay if nowcasting overlays are preset*/
 
+    const overlay: string = windyStore.get('overlay');
+    if (overlay == 'satellite' || overlay == 'radar' || overlay == 'radar-plus') {
+      alert('Windy overlay is automatically set to wind \n as ' + overlay + ' layer is not a model overlay.');
+      windyStore.set('overlay', 'wind');
+    }
+
+
+  }
 }
