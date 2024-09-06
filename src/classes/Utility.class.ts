@@ -1,5 +1,7 @@
+import windyStore from '@windy/store';
 import metrics from '@windy/metrics';
 import { LocationDetails } from './Locationdetails.interface';
+
 
 export class Utility {
 
@@ -232,9 +234,19 @@ export class Utility {
     //dddff(1) Mittelwindgeschwindigkeit
     //dddff(2) = xMittel
     //dddff(3) = yMittel
-    
+
     return dddff;
   }
 
+  static checkOverlay() {
+    /* Check overlay and change to wind overlay if nowcasting overlays are preset*/
 
+    const overlay: string = windyStore.get('overlay');
+    if (overlay == 'satellite' || overlay == 'radar' || overlay == 'radar-plus') {
+      alert('Windy overlay is automatically set to wind \n as ' + overlay + ' layer is not a model overlay.');
+      windyStore.set('overlay', 'wind');
+    }
+
+
+  }
 }

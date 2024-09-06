@@ -266,6 +266,7 @@
         }
     }
 
+    
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
@@ -279,6 +280,7 @@
 
         bcast.on('pluginOpened', async () => {
             console.log('In onopen pluginOpened ');
+            Utility.checkOverlay();
             popup
                 .setLatLng([_params.lat, _params.lon])
                 .setContent('Loading....')
@@ -295,6 +297,7 @@
         /** Eventhandler for the click on the map*/
         singleclick.on('windy-plugin-upper-winds', async ev => {
             console.log('In onMount singleclick');
+            Utility.checkOverlay();
             position = { lat: ev.lat, lon: ev.lon };
             /* Create a Popup to show the clicked position*/
             popup
@@ -309,6 +312,7 @@
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
             console.log('In onMount paramsChanged');
+            Utility.checkOverlay();
             if (position === undefined) return;
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
