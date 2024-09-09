@@ -241,7 +241,7 @@ export class Utility {
   static checkOverlay() {
     /* Check overlay and change to wind overlay if nowcasting overlays are preset*/
     const overlay: string = windyStore.get('overlay');
-    if (overlay == 'satellite' || overlay == 'radar' || overlay == 'radar-plus') {
+    if (overlay == 'satellite' || overlay == 'radar' || overlay == 'radarPlus') {
       alert('Windy overlay is automatically set to wind \n as ' + overlay + ' layer is not a model overlay.');
       windyStore.set('overlay', 'wind');
     }
