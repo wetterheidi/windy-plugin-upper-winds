@@ -352,6 +352,8 @@
         padding: 10px;
         background-color: #f8f8f8;
         text-align: center;
+        max-height: 450px;
+        overflow: auto;
         th {
             color: black; /* Sets the text color of headers to black */
             background-color: #e5e5e5; /* Optional: sets a light gray background for better contrast */

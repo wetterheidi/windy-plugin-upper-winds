@@ -10,7 +10,7 @@ const config: ExternalPluginConfig = {
     repository: 'https://github.com/wetterheidi/windy-plugin-upper-winds.git',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
-    routerPath: '/upper-winds',
+    routerPath: '/mff-winds',
     desktopWidth: 500,
     listenToSingleclick: true,
     addToContextmenu: true,
