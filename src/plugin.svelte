@@ -52,15 +52,22 @@
                         <th>%</th>
                     </tr>
                 </thead>
-                <tbody>
+            </table>
+        </div>
+        <div class="weather-stats">
+            <table>
+                <tbody class="scroll">
                     {#each flightLevels as { heightAGL, height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
                         <tr
-                            class:green-text={temperature > freezingLevelAt - 0.5 &&
+                            class:green-text={temperature >
+                                freezingLevelAt - 0.5 &&
                                 temperature < freezingLevelAt + 0.5}
-                            class:blue-text={temperature <= freezingLevelAt - 0.5}
-                            class:red-text={temperature >= freezingLevelAt + 0.5}
+                            class:blue-text={temperature <=
+                                freezingLevelAt - 0.5}
+                            class:red-text={temperature >=
+                                freezingLevelAt + 0.5}
                         >
-                            {#if settings.referenceLevel == 'AGL'}
+                            {#if settings.referenceLevel == "AGL"}
                                 <td>{heightAGL}</td>
                             {:else}
                                 <td>{height}</td>
