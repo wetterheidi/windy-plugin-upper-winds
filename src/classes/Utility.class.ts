@@ -1,6 +1,8 @@
 import windyStore from '@windy/store';
 import metrics from '@windy/metrics';
 import { LocationDetails } from './Locationdetails.interface';
+import { defaults } from 'export-to-csv/output/lib/config';
+import { destroyed } from './plugins.svelte';
 
 
 export class Utility {

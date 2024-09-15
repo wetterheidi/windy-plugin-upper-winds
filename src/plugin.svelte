@@ -59,15 +59,12 @@
                 <tbody class="scroll">
                     {#each flightLevels as { heightAGL, height, windDir, windSp, pressure, temperature, humidityWater, dewPointt }}
                         <tr
-                            class:green-text={temperature >
-                                freezingLevelAt - 0.5 &&
+                            class:green-text={temperature > freezingLevelAt - 0.5 &&
                                 temperature < freezingLevelAt + 0.5}
-                            class:blue-text={temperature <=
-                                freezingLevelAt - 0.5}
-                            class:red-text={temperature >=
-                                freezingLevelAt + 0.5}
+                            class:blue-text={temperature <= freezingLevelAt - 0.5}
+                            class:red-text={temperature >= freezingLevelAt + 0.5}
                         >
-                            {#if settings.referenceLevel == "AGL"}
+                            {#if settings.referenceLevel == 'AGL'}
                                 <td>{heightAGL}</td>
                             {:else}
                                 <td>{height}</td>
@@ -166,7 +163,8 @@
     let elevation: any;
     let position: LatLon | undefined = undefined;
     let meanWindDirection: number;
-        let meanWindSpeed: number;
+    let meanWindSpeed: number;
+    let destroyed: boolean = true;
 
     const { title } = config;
     const { version } = config;
@@ -214,7 +212,7 @@
         const heightMSLArray = flightLevels.map(row => row.height);
         const wind_uArray = flightLevels.map(row => row.wind_u);
         const wind_vArray = flightLevels.map(row => row.wind_v);
-       
+
         if (settings.referenceLevel == 'AGL') {
             meanWindDirection = Utility.Mittelwind(
                 heightAGLArray,
@@ -246,7 +244,7 @@
                 Number(upperwind._upperLevel),
             )[1];
         }
-        
+
         console.log('Unten: ' + upperwind._lowerLevel + ' Oben: ' + upperwind._upperLevel);
         upperwind._step = Number(settings.increment);
         upperwind._reference = settings.referenceLevel;
@@ -256,7 +254,6 @@
         }
     }
 
-    
     /* Add layer for lines to the map*/
     var activeLayer = L.featureGroup().addTo(map);
     var popup = L.popup({ autoClose: false, closeOnClick: false, closeButton: false });
@@ -267,10 +264,12 @@
         if (!_params) {
             return; // Ignore null _params and do not execute further
         }
-
+        destroyed = false;
         bcast.on('pluginOpened', async () => {
             console.log('In onopen pluginOpened ');
-            Utility.checkOverlay();
+            if (destroyed == false) {
+                Utility.checkOverlay();
+            }
             popup
                 .setLatLng([_params.lat, _params.lon])
                 .setContent('Loading....')
@@ -285,10 +284,13 @@
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
+        destroyed = false;
 
         singleclick.on('windy-plugin-upper-winds', async ev => {
             console.log('In onMount singleclick');
-            Utility.checkOverlay();
+            if (destroyed == false) {
+                Utility.checkOverlay();
+            }
             position = { lat: ev.lat, lon: ev.lon };
             /* Create a Popup to show the clicked position*/
             popup
@@ -310,7 +312,9 @@
         /** Eventhandler for stepping forward or backward in time*/
         bcast.on('paramsChanged', async () => {
             console.log('In onMount paramsChanged');
-            Utility.checkOverlay();
+            if (destroyed == false) {
+                Utility.checkOverlay();
+            }
             if (position === undefined) return;
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
@@ -322,6 +326,7 @@
     });
 
     onDestroy(() => {
+        destroyed = true;
         console.log('Im onDestroy');
         popup.remove();
         bcast.off('paramsChanged');
