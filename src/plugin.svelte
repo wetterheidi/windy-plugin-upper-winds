@@ -164,7 +164,7 @@
     let position: LatLon | undefined = undefined;
     let meanWindDirection: number;
     let meanWindSpeed: number;
-    let destroyed: boolean = true;
+    let destroyed: boolean = false;
 
     const { title } = config;
     const { version } = config;
@@ -267,9 +267,8 @@
         destroyed = false;
         bcast.on('pluginOpened', async () => {
             console.log('In onopen pluginOpened ');
-            if (destroyed == false) {
-                Utility.checkOverlay();
-            }
+            if (destroyed == true) return;
+            Utility.checkOverlay();
             popup
                 .setLatLng([_params.lat, _params.lon])
                 .setContent('Loading....')
@@ -284,8 +283,7 @@
 
     onMount(() => {
         /** Eventhandler for the click on the map*/
-        destroyed = false;
-
+        if (destroyed == true) return;
         singleclick.on('windy-plugin-upper-winds', async ev => {
             console.log('In onMount singleclick');
             if (destroyed == false) {
@@ -331,7 +329,7 @@
         popup.remove();
         bcast.off('paramsChanged');
         bcast.off('pluginOpened');
-        singleclick.off;
+        singleclick.off('windy-plugin-upper-winds');
         map.removeControl(bcast);
     });
 
