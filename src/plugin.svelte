@@ -278,6 +278,7 @@
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
+            map.setView(new L.LatLng(_params.lat, _params.lon),11);
         });
     };
 
@@ -299,6 +300,7 @@
             await upperwind.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
+            map.setView(new L.LatLng(position.lat, position.lon),11);
         });
         bcast.on('pluginOpened', async () => {
             if (position === undefined) return;
