@@ -174,11 +174,16 @@
     /* Settings for temperature*/
     let temperatureUnit: string = Utility.findOutTemperatureUnit(273.15); //Kelvin in raw data
     let freezingLevelAt: number = 0;
-    if (temperatureUnit === '°C') {
-        freezingLevelAt = 0;
-    } else if (temperatureUnit === '°F') {
-        freezingLevelAt = 32;
+    function freezingLevel() {
+        if (temperatureUnit === '°C') {
+            freezingLevelAt = 0;
+        } else if (temperatureUnit === '°F') {
+            freezingLevelAt = 32;
+        }
+        return freezingLevelAt;
     }
+    freezingLevelAt = freezingLevel();
+    
     /* Settings for wind*/
     let windUnit: string = Utility.findOutWindUnit(10); // m/s in raw data
 
@@ -342,6 +347,11 @@
 
     /* Assigns the Analysis to a location and a model*/
     function assignAnalysis(upperwind: UpperWind) {
+        temperatureUnit = Utility.findOutTemperatureUnit(0);
+        altitudeUnit = Utility.findOutAltitudeUnit(1000);
+        windUnit = Utility.findOutWindUnit(10);
+        freezingLevelAt = freezingLevel();
+
         clickLocation = upperwind.clickLocation;
         flightLevels = upperwind.flightLevels;
         filteredFlightLevels = flightLevels.filter(
