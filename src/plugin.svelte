@@ -305,6 +305,11 @@
         bcast.on('pluginOpened', async () => {
             if (position === undefined) return;
             upperwind.setTime(windyStore.get('timestamp'));
+            popup
+                .setLatLng([position.lat, position.lon])
+                .setContent('Loading....')
+                .addTo(activeLayer)
+                .openOn(map);
             await upperwind.handleEvent(position); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
