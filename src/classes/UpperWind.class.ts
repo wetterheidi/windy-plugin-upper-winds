@@ -132,7 +132,7 @@ export class UpperWind {
 
     /** Call the Windy API for the sounding forecast */
     private fetchData(lat: any, lon: any, product: any) {
-        return windyFetch.getMeteogramForecastData(product, { lat, lon });
+        return windyFetch.getMeteogramForecastData(product, { lat, lon }, {  extended: true });
     }
 
     /**
