@@ -36,6 +36,8 @@ export class UpperWind {
     public _lowerLevel: string = '0';
     /** Upper level for mean wind calculation */
     public _upperLevel: string = '3000';
+    /** In case of times later than available, this is set to true to avoid wrong time/data tables */
+    public _errorhandler: boolean = false;
 
     setTime(t: number) {
         this._timestamp = t;
@@ -78,6 +80,9 @@ export class UpperWind {
         return date.toString();
     }
 
+    get errorhandler() {
+        return this._errorhandler;
+    }
     get model() {
         return this._model;
     }
@@ -107,8 +112,10 @@ export class UpperWind {
             this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
+            this._errorhandler = false; 
         } catch (error) {
             console.error('* * * An error occurred:', error);
+            this._errorhandler = true;
         }
     }
 
@@ -132,7 +139,7 @@ export class UpperWind {
 
     /** Call the Windy API for the sounding forecast */
     private fetchData(lat: any, lon: any, product: any) {
-        return windyFetch.getMeteogramForecastData(product, { lat, lon }, {  extended: true });
+        return windyFetch.getMeteogramForecastData(product, { lat, lon, step:1, extended: true });
     }
 
     /**

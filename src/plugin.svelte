@@ -11,6 +11,8 @@
 
     {#if !ready}
         <h4><strong>Click on map to generate an upper wind table</strong></h4>
+    {:else if errorHandlerOutput}
+         <h4><strong>No forecast available for {forecastDateString}</strong></h4>
     {:else}
         <h4>
             <strong>Location: </strong><br />
@@ -183,7 +185,7 @@
         return freezingLevelAt;
     }
     freezingLevelAt = freezingLevel();
-    
+
     /* Settings for wind*/
     let windUnit: string = Utility.findOutWindUnit(10); // m/s in raw data
 
@@ -206,11 +208,16 @@
 
     let lowerAltitudeInput: string = '0';
     let upperAltitudeInput: string = '3000';
+    let errorHandlerOutput: boolean = false;
 
     //On settings changed, recalculate upper winds table
     $: {
         upperwind._lowerLevel = lowerAltitudeInput;
         upperwind._upperLevel = upperAltitudeInput;
+
+        errorHandlerOutput = false;
+        errorHandlerOutput = upperwind._errorhandler;
+        console.log(errorHandlerOutput);
 
         /* create Arrays for mean winds*/
         const heightAGLArray = flightLevels.map(row => row.heightAGL);
@@ -283,7 +290,7 @@
             await upperwind.handleEvent(_params); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
-            map.setView(new L.LatLng(_params.lat, _params.lon),11);
+            map.setView(new L.LatLng(_params.lat, _params.lon), 11);
         });
     };
 
@@ -305,7 +312,7 @@
             await upperwind.handleEvent(ev); // Wait for handleEvent to complete
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
-            map.setView(new L.LatLng(position.lat, position.lon),11);
+            map.setView(new L.LatLng(position.lat, position.lon), 11);
         });
         bcast.on('pluginOpened', async () => {
             if (position === undefined) return;
