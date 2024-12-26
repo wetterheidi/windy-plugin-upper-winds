@@ -8,8 +8,6 @@ import {
 import metrics from '@windy/metrics';
 import { Sounding } from './Sounding.interface';
 import { Utility } from './Utility.class';
-import { noConflict } from 'jquery';
-
 
 export class UpperWind {
 
@@ -121,10 +119,10 @@ export class UpperWind {
 
             // Error handling for wrong time/data tables
             const timediff = this._timestamp - this._initTime;
-            //console.log('*****************Timestamp' + timediff + 'Modell: ' + this._model);
+            console.log('*****************Timestamp' + timediff + 'Modell: ' + this._model);
             if (this._model == "ICON-GLOBAL" && timediff > 482400000) {
                 this._errorhandler = true;
-            } else if (this._model == "ECMWF_HRES" && timediff > 42000000) {
+            } else if (this._model == "ECMWF-HRES" && timediff > 462000000) {
                 this._errorhandler = true;
             } else if (this._model == "NOAA-GFS" && timediff > 345000000) {
                 this._errorhandler = true;
@@ -156,17 +154,12 @@ export class UpperWind {
 
     /** Call the Windy API for the sounding forecast */
     private fetchData(lat: any, lon: any, product: any) {
-        return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1, extended: true });
+        return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1, subscription: 'premium' });
         /*
-        const timediff = this._timestamp - this._initTime;
-        console.log('*****************Timestamp' + timediff);
-        
-        if (store.get('subscription') === 'premium' && timediff < 482400000) {
+        if (store.get('subscription') === 'premium') {
             return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1, extended: true });
-        } else if (store.get('subscription') != 'premium' && timediff < 482400000) {
+        } else  {
             return windyFetch.getMeteogramForecastData(product, { lat, lon, extended: true });
-        } else {
-            return (this._errorhandler = true); // Set errorhandler to true to avoid wrong time/data tables
         }*/
     }
 
@@ -196,7 +189,7 @@ export class UpperWind {
                 const pressure = +suffix.slice(0, -1);
                 const heightInMeters = +weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn];
                 const height = +(metrics.altitude.convertNumber((weatherData.data[key as keyof MeteogramDataHash][this._forecastColumn]), 2)); //Convert model output to User settings
-                const heightAGL = +(metrics.altitude.convertNumber((heightInMeters - this.elevation).toFixed(this._forecastColumn), 2)); // Convert to AGL
+                const heightAGL = +(metrics.altitude.convertNumber((heightInMeters - this.elevation).toFixed(0), 2)); // Convert to AGL
                 //First get u and v component of wind
                 const wind_u = +weatherData.data[wind_uKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
                 const wind_v = +weatherData.data[wind_vKey as keyof MeteogramDataHash][this._forecastColumn].toFixed(0);
