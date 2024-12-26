@@ -217,7 +217,7 @@
 
         errorHandlerOutput = false;
         errorHandlerOutput = upperwind._errorhandler;
-        console.log(errorHandlerOutput);
+        console.log('Errorhandler: ' + errorHandlerOutput);
 
         /* create Arrays for mean winds*/
         const heightAGLArray = flightLevels.map(row => row.heightAGL);

@@ -248,4 +248,31 @@ export class Utility {
       windyStore.set('overlay', 'wind');
     }
   }
+
+  static arraysAreEqual(arr1: any[], arr2: any[]): boolean {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static arraysContainSameElements(arr1: any[], arr2: any[]): boolean {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    const sortedArr1 = arr1.slice().sort();
+    const sortedArr2 = arr2.slice().sort();
+    return Utility.arraysAreEqual(sortedArr1, sortedArr2);
+  }
+
+  static difference(arr1: any[], arr2: any[]): any[] {
+    return arr1.filter(item => !arr2.includes(item));
+  }
+
+
 }
