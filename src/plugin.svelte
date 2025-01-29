@@ -346,10 +346,15 @@
         destroyed = true;
         console.log('Im onDestroy');
         popup.remove();
-        bcast.off('paramsChanged');
-        bcast.off('pluginOpened');
-        singleclick.off('windy-plugin-upper-winds');
+        bcast.off('paramsChanged', onMount);
+        bcast.off('pluginOpened', onMount);
+        bcast.off('pluginClosed', onMount);
+        singleclick.emit('windy-plugin-upper-winds', 'destroy');
+        //singleclick.off('windy-plugin-mff', onMount);
         map.removeControl(bcast);
+        windyStore.off('timestamp', upperwind.setTime);
+        windyStore.off('overlay', Utility.checkOverlay);
+        windyStore.off('product', upperwind.handleEvent);
     });
 
     /* Assigns the Analysis to a location and a model*/
