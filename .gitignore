@@ -9,5 +9,9 @@ node_modules
 package-lock.json
 *.log
 dist/*
+!dist/plugin.js
+!dist/plugin.min.js
+!dist/plugin.json
+!dist/screenshot.jpg
 untracked/*
 

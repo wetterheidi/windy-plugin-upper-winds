@@ -154,7 +154,7 @@ export class UpperWind {
 
     /** Call the Windy API for the sounding forecast */
     private fetchData(lat: any, lon: any, product: any) {
-        return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1, subscription: 'premium' });
+        return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1 });
         /*
         if (store.get('subscription') === 'premium') {
             return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1, extended: true });

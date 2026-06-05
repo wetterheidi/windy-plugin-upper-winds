@@ -9,6 +9,9 @@
         {title} <span style="font-size: 0.5em;">v{version}</span>
     </div>
 
+    {#if overlayWarning}
+        <div class="overlay-warning">{overlayWarning}</div>
+    {/if}
     {#if !ready}
         <h4><strong>Click on map to generate an upper wind table</strong></h4>
     {:else if errorHandlerOutput}
@@ -204,6 +207,11 @@
     let lowerAltitudeInput: string = '0';
     let upperAltitudeInput: string = '3000';
     let errorHandlerOutput: boolean = false;
+    let overlayWarning: string = '';
+    let openParamHandler: (() => Promise<void>) | null = null;
+    let pluginOpenedHandler: (() => Promise<void>) | null = null;
+    let paramsChangedHandler: (() => Promise<void>) | null = null;
+    let pluginClosedHandler: (() => void) | null = null;
 
     //On settings changed, recalculate upper winds table
     $: {
@@ -265,26 +273,25 @@
     // Make the popup draggable
     let draggablePopup: any;
     async function makePopupDraggable() {
-        if (!draggablePopup) {
-            draggablePopup = new L.Draggable(popup._container, popup._wrapper);
-            draggablePopup.enable();
+        try {
+            if (!draggablePopup) {
+                draggablePopup = new L.Draggable((popup as any)._container, (popup as any)._wrapper);
+                draggablePopup.enable();
 
-            // Update position and fetch new data when dragging ends
-            draggablePopup.on('dragend', async function () {
-                const containerPoint = map.layerPointToContainerPoint(draggablePopup._newPos);
-                const latlng = map.containerPointToLatLng(containerPoint);
-                popup.setLatLng(latlng); // Update popup position
-                position = { lat: latlng.lat, lon: latlng.lng }; // Update position variable
-
-                // Show loading state
-                popup.setContent('Loading....');
-
-                // Fetch new weather data for the updated position
-                upperwind.setTime(windyStore.get('timestamp'));
-                await upperwind.handleEvent(position); // Fetch new data
-                assignAnalysis(upperwind); // Update UI with new data
-                popup.setContent(clickLocation); // Update popup content
-            });
+                draggablePopup.on('dragend', async function () {
+                    const containerPoint = map.layerPointToContainerPoint(draggablePopup._newPos);
+                    const latlng = map.containerPointToLatLng(containerPoint);
+                    popup.setLatLng(latlng);
+                    position = { lat: latlng.lat, lon: latlng.lng };
+                    popup.setContent('Loading....');
+                    upperwind.setTime(windyStore.get('timestamp'));
+                    await upperwind.handleEvent(position);
+                    assignAnalysis(upperwind);
+                    popup.setContent(clickLocation);
+                });
+            }
+        } catch (_e) {
+            draggablePopup = null;
         }
     }
 
@@ -295,22 +302,27 @@
             return;
         }
         destroyed = false;
-        bcast.on('pluginOpened', async () => {
+        if (openParamHandler) {
+            bcast.off('pluginOpened', openParamHandler);
+        }
+        openParamHandler = async () => {
             console.log('In onopen pluginOpened ');
             if (destroyed == true) return;
-            Utility.checkOverlay();
+            const warning = Utility.checkOverlay();
+            if (warning) overlayWarning = warning;
             popup
                 .setLatLng([_params.lat, _params.lon])
                 .setContent('Loading....')
                 .addTo(activeLayer)
                 .openOn(map);
-            makePopupDraggable(); // Enable dragging
+            makePopupDraggable();
             upperwind.setTime(windyStore.get('timestamp'));
             await upperwind.handleEvent(_params);
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
             map.setView(new L.LatLng(_params.lat, _params.lon), 11);
-        });
+        };
+        bcast.on('pluginOpened', openParamHandler);
     };
 
     onMount(() => {
@@ -318,7 +330,8 @@
         singleclick.on('windy-plugin-upper-winds', async ev => {
             console.log('In onMount singleclick');
             if (destroyed == false) {
-                Utility.checkOverlay();
+                const warning = Utility.checkOverlay();
+                if (warning) overlayWarning = warning;
             }
             position = { lat: ev.lat, lon: ev.lon };
             popup
@@ -326,14 +339,14 @@
                 .setContent('Loading....')
                 .addTo(activeLayer)
                 .openOn(map);
-            makePopupDraggable(); // Enable dragging
+            makePopupDraggable();
             await upperwind.handleEvent(ev);
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
             map.setView(new L.LatLng(position.lat, position.lon), 11);
         });
 
-        bcast.on('pluginOpened', async () => {
+        pluginOpenedHandler = async () => {
             if (position === undefined) return;
             upperwind.setTime(windyStore.get('timestamp'));
             popup
@@ -341,46 +354,47 @@
                 .setContent('Loading....')
                 .addTo(activeLayer)
                 .openOn(map);
-            makePopupDraggable(); // Enable dragging
+            makePopupDraggable();
             await upperwind.handleEvent(position);
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
-        });
+        };
+        bcast.on('pluginOpened', pluginOpenedHandler);
 
-        // Handle timestamp or model changes
-        bcast.on('paramsChanged', async () => {
+        paramsChangedHandler = async () => {
             console.log('In onMount paramsChanged');
             if (destroyed == false) {
-                Utility.checkOverlay();
+                const warning = Utility.checkOverlay();
+                if (warning) overlayWarning = warning;
             }
             if (position === undefined) return;
 
-            // Update timestamp and re-fetch data (model handled internally by handleEvent)
             upperwind.setTime(windyStore.get('timestamp'));
             popup.setContent('Loading....');
-            await upperwind.handleEvent(position); // Re-fetch data with current model and timestamp
+            await upperwind.handleEvent(position);
             assignAnalysis(upperwind);
             popup.setContent(clickLocation);
-        });
+        };
+        bcast.on('paramsChanged', paramsChangedHandler);
 
-        bcast.on('pluginClosed', async () => {
+        pluginClosedHandler = () => {
             popup.closePopup();
-        });
+        };
+        bcast.on('pluginClosed', pluginClosedHandler);
     });
 
     onDestroy(() => {
         destroyed = true;
-        console.log('Im onDestroy');
         popup.remove();
         if (draggablePopup) {
             draggablePopup.disable();
             draggablePopup.off('dragend');
         }
-        bcast.off('paramsChanged', onMount);
-        bcast.off('pluginOpened', onMount);
-        bcast.off('pluginClosed', onMount);
+        if (paramsChangedHandler) bcast.off('paramsChanged', paramsChangedHandler);
+        if (pluginOpenedHandler) bcast.off('pluginOpened', pluginOpenedHandler);
+        if (pluginClosedHandler) bcast.off('pluginClosed', pluginClosedHandler);
+        if (openParamHandler) bcast.off('pluginOpened', openParamHandler);
         singleclick.emit('windy-plugin-upper-winds', 'destroy');
-        map.removeControl(bcast);
         windyStore.off('timestamp', upperwind.setTime);
         windyStore.off('overlay', Utility.checkOverlay);
         windyStore.off('product', upperwind.handleEvent);
@@ -517,5 +531,14 @@
     .popupCustom .leaflet-popup-content-wrapper {
         background: #e0e0e0;
         color: #234c5e;
+    }
+
+    .overlay-warning {
+        background-color: #ffd700;
+        color: #333;
+        padding: 8px;
+        border-radius: 3px;
+        margin-bottom: 8px;
+        font-size: 0.85em;
     }
 </style>
