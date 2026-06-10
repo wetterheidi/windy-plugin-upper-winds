@@ -1,6 +1,6 @@
 const __pluginConfig =  {
   "name": "windy-plugin-upper-winds",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "icon": "🪂",
   "title": "Upper winds",
   "description": "Show upper winds, temperature and humidity at a given position",
@@ -8,13 +8,13 @@ const __pluginConfig =  {
   "repository": "https://github.com/wetterheidi/windy-plugin-upper-winds.git",
   "desktopUI": "rhpane",
   "mobileUI": "fullscreen",
-  "routerPath": "/mff-winds",
+  "routerPath": "/upper-winds",
   "desktopWidth": 500,
   "listenToSingleclick": true,
   "addToContextmenu": true,
-  "private": true,
-  "built": 1781104135675,
-  "builtReadable": "2026-06-10T15:08:55.675Z",
+  "private": false,
+  "built": 1781104428517,
+  "builtReadable": "2026-06-10T15:13:48.517Z",
   "screenshot": "screenshot.jpg"
 };
 
@@ -710,7 +710,7 @@ if (typeof window !== 'undefined')
 	(window.__svelte || (window.__svelte = { v: new Set() })).v.add(PUBLIC_VERSION);
 
 const config = {
-    version: '0.0.24',
+    version: '0.0.25',
     title: 'Upper winds'};
 
 class Utility {
