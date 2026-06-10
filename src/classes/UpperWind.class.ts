@@ -29,6 +29,8 @@ export class UpperWind {
     private _elevation = 0;
     /** Init time of model */
     private _initTime = 0;
+    /** Available forecast hours of the model */
+    private _hours: number[] = [];
     /** Step (i.e. height increment to interpolate) */
     public _step = 0;
     /** Reference level for altitude */
@@ -94,6 +96,12 @@ export class UpperWind {
         return this._reference;
     }
 
+    /** Timestamp of the neighbouring forecast step, or undefined at both ends
+     * of the forecast range */
+    neighbourTimestamp(direction: number): number | undefined {
+        return this._hours[this._forecastColumn + direction];
+    }
+
     restratify() {
         if (this._rawdata.length) {
             this._flightLevels = this.stratify(this._rawdata);
@@ -111,15 +119,15 @@ export class UpperWind {
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
             //this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data from API
             //this._step = 500; // set height increment to interpolate
-            this.findNearestColumn(weatherData.data.data.hours);
-            this._forecastDate = weatherData.data.data.hours[this._forecastColumn];
+            this._hours = weatherData.data.data.hours;
+            this.findNearestColumn(this._hours);
+            this._forecastDate = this._hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
             this._errorhandler = false;
 
             // Error handling for wrong time/data tables
             const timediff = this._timestamp - this._initTime;
-            console.log('*****************Timestamp' + timediff + 'Modell: ' + this._model);
             if (this._model == "ICON-GLOBAL" && timediff > 482400000) {
                 this._errorhandler = true;
             } else if (this._model == "ECMWF-HRES" && timediff > 462000000) {
@@ -219,9 +227,7 @@ export class UpperWind {
 
         // Sorting the array by height in descending order
         this._rawdata.sort((a, b) => b.height - a.height);
-        console.log('Processed Layers Data:', this._rawdata);
         this._flightLevels = this.stratify(this._rawdata);
-        console.log('Stratified Data:', this.flightLevels);
     };
 
 
@@ -290,11 +296,13 @@ export class UpperWind {
     }
 
     /**
-     * Converts the raw data, sorted by pressure, into interpolated data layered by flight levels.
-     * The interpolation is done for every 1000 feet, starting from the highest point down to the lowest.
+     * Interpolates all meteorological values between two sounding layers at the target height.
      *
-     * @param {Sounding[]} data - The array of sounding data objects, each containing height and other meteorological data.
-     * @returns {Sounding[]} - The array of stratified data objects, each representing an interpolated flight level.
+     * @param {Sounding} lower - The sounding data below the target height.
+     * @param {Sounding} upper - The sounding data above the target height.
+     * @param {number} targetHeight - The height to interpolate to.
+     * @param {string} previousHuman - Human readable label carried over from the previous layer.
+     * @returns {Sounding} - The interpolated flight level.
      */
     private interpolate(lower: Sounding, upper: Sounding, targetHeight: number, previousHuman: string): Sounding {
         const ratio = (targetHeight - upper.height) / (lower.height - upper.height);
