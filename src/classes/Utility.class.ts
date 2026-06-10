@@ -70,15 +70,6 @@ export class Utility {
     return ddd;
   }
 
-  static async getElevation(lat: number, lon: number): Promise<number> {
-    // Fetch terrain elevation according to 
-    //https://chatgpt.com/share/141edd4b-8987-444f-8cb8-e7f5cbb0f001
-    const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`);
-    const data = await response.json();
-
-    return data.results[0].elevation;
-  }
-
   static calculatePressure(p: number, h: number): number {
     // reduce the pressure down to sea level rounded to hole hPa values
     let qnh: number = 0;
@@ -245,31 +236,4 @@ export class Utility {
     }
     return null;
   }
-
-  static arraysAreEqual(arr1: any[], arr2: any[]): boolean {
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-    for (let i = 0; i < arr1.length; i++) {
-      if (arr1[i] !== arr2[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  static arraysContainSameElements(arr1: any[], arr2: any[]): boolean {
-    if (arr1.length !== arr2.length) {
-      return false;
-    }
-    const sortedArr1 = arr1.slice().sort();
-    const sortedArr2 = arr2.slice().sort();
-    return Utility.arraysAreEqual(sortedArr1, sortedArr2);
-  }
-
-  static difference(arr1: any[], arr2: any[]): any[] {
-    return arr1.filter(item => !arr2.includes(item));
-  }
-
-
 }

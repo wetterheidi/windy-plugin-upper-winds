@@ -17,8 +17,6 @@ export class UpperWind {
     private _flightLevels: Sounding[] = [];
     /** Human readable location of click */
     private _clickLocation = '';
-    /** Date of forecast */
-    private _forecastDate = 0;
     /** Model used */
     private _model = '';
     /** The forecast nearest to current time */
@@ -41,8 +39,6 @@ export class UpperWind {
     public _upperLevel: string = '3000';
     /** In case of times later than available, this is set to true to avoid wrong time/data tables */
     public _errorhandler: boolean = false;
-    /** Old raw data for comparison */
-    public raw_data_old: Sounding[] = [];
 
     setTime(t: number) {
         this._timestamp = t;
@@ -50,14 +46,6 @@ export class UpperWind {
 
     get getTime() {
         return this._timestamp;
-    }
-
-    get lowerLevel() {
-        return this._lowerLevel;
-    }
-
-    get upperLevel() {
-        return this._upperLevel;
     }
 
     /** Return the final elevation */
@@ -80,14 +68,6 @@ export class UpperWind {
         return this._clickLocation;
     }
 
-    get forecastDate() {
-        const date = new Date(this._forecastDate);
-        return date.toString();
-    }
-
-    get errorhandler() {
-        return this._errorhandler;
-    }
     get model() {
         return this._model;
     }
@@ -117,11 +97,8 @@ export class UpperWind {
             const locationObject = await reverseName.get({ lat: ev.lat, lon: ev.lon }); // Retrieve the location data
             this._clickLocation = Utility.locationDetails(locationObject); // Convert to human readable
             const weatherData = await this.fetchData(ev.lat, ev.lon, product); // Retrieve the sounding from location
-            //this._elevation = await Utility.getElevation(ev.lat, ev.lon); // Get elevation data from API
-            //this._step = 500; // set height increment to interpolate
             this._hours = weatherData.data.data.hours;
             this.findNearestColumn(this._hours);
-            this._forecastDate = this._hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data); // Interpret the data
             this._errorhandler = false;
@@ -163,12 +140,6 @@ export class UpperWind {
     /** Call the Windy API for the sounding forecast */
     private fetchData(lat: any, lon: any, product: any) {
         return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1 });
-        /*
-        if (store.get('subscription') === 'premium') {
-            return windyFetch.getMeteogramForecastData(product, { lat, lon, step: 1, extended: true });
-        } else  {
-            return windyFetch.getMeteogramForecastData(product, { lat, lon, extended: true });
-        }*/
     }
 
     /**
@@ -181,7 +152,6 @@ export class UpperWind {
         this._rawdata = []; // Array to store data for each layer
         this._elevation = weatherData.header.elevation; //Pick elevation from windy API
         this._initTime = weatherData.header.updateTs; //Init of model
-        //console.log('_____________' , JSON.stringify(weatherData.header)); //Code to find out the structure of weatherData.header
 
         // Loop over all properties in weatherData.data.data
         for (const key in weatherData.data) {
@@ -249,7 +219,6 @@ export class UpperWind {
             startHeight = (Math.floor((data[0].height - this.elevation * mInFtFactor) / this.step) * this.step + (this.elevation * mInFtFactor)); // Highest point (AMSL)
             // Lowest point above ground level, rounded down to nearest "half step", substract "half step" to find ground level
             endHeight = Math.ceil((data[data.length - 1].height + this.elevation * mInFtFactor) / (this.step / 2)) * (this.step / 2) - (this.step / 2);
-            //console.log('end height referring to AMSL: ' + endHeight + ' Elevation: ' + this.elevation * mInFtFactor);
             if (endHeight < 0) {
                 endHeight = 0;
             }
@@ -263,12 +232,9 @@ export class UpperWind {
         }
         // Avoiding NaN in pressure values greater then 1000 hPa
         if (isNaN(data[data.length - 1].pressure)) {
-            //data[data.length - 1].pressure = data[data.length - 2].pressure + (data[data.length - 2].height / 32);
             data[data.length - 1].pressure = Utility.calculatePressure((data[data.length - 2].pressure), (data[data.length - 2].height));
-            //console.log('calculated pressure: ' + data[data.length - 1].pressure);
         } else if (isNaN(data[data.length - 2].pressure)) {
             data[data.length - 2].pressure = Utility.calculatePressure((data[data.length - 3].pressure), (data[data.length - 3].height));
-            //console.log('calculated pressure: ' + data[data.length - 2].pressure);
         }
 
         let previousHuman = '';
@@ -333,12 +299,6 @@ export class UpperWind {
             ratio,
         );
 
-        /* const wind_u = Utility.linearInterpolation(
-             upper.wind_u,
-             lower.wind_u,
-             ratio,
-         );*/
-
         const wind_u = Utility.gaussianInterpolation(
             upper.wind_u,
             lower.wind_u,
@@ -346,12 +306,6 @@ export class UpperWind {
             lower.height,
             targetHeight,
         );
-
-        /* const wind_v = Utility.linearInterpolation(
-            upper.wind_v,
-            lower.wind_v,
-            ratio,
-        ); */
 
         const wind_v = Utility.gaussianInterpolation(
             upper.wind_v,

@@ -8,12 +8,12 @@
   "repository": "https://github.com/wetterheidi/windy-plugin-upper-winds.git",
   "desktopUI": "rhpane",
   "mobileUI": "fullscreen",
-  "routerPath": "/mff-winds",
+  "routerPath": "/upper-winds",
   "desktopWidth": 500,
   "listenToSingleclick": true,
   "addToContextmenu": true,
   "private": true,
-  "built": 1781099094125,
-  "builtReadable": "2026-06-10T13:44:54.125Z",
+  "built": 1781103710379,
+  "builtReadable": "2026-06-10T15:01:50.379Z",
   "screenshot": "screenshot.jpg"
 }

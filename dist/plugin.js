@@ -8,13 +8,13 @@ const __pluginConfig =  {
   "repository": "https://github.com/wetterheidi/windy-plugin-upper-winds.git",
   "desktopUI": "rhpane",
   "mobileUI": "fullscreen",
-  "routerPath": "/mff-winds",
+  "routerPath": "/upper-winds",
   "desktopWidth": 500,
   "listenToSingleclick": true,
   "addToContextmenu": true,
   "private": true,
-  "built": 1781099094113,
-  "builtReadable": "2026-06-10T13:44:54.113Z",
+  "built": 1781103710362,
+  "builtReadable": "2026-06-10T15:01:50.362Z",
   "screenshot": "screenshot.jpg"
 };
 
@@ -719,7 +719,7 @@ const config = {
     repository: 'https://github.com/wetterheidi/windy-plugin-upper-winds.git',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
-    routerPath: '/mff-winds',
+    routerPath: '/upper-winds',
     desktopWidth: 500,
     listenToSingleclick: true,
     addToContextmenu: true,
@@ -767,11 +767,6 @@ class Utility {
             ddd = 360;
         }
         return ddd;
-    }
-    static async getElevation(lat, lon) {
-        const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lon}`);
-        const data = await response.json();
-        return data.results[0].elevation;
     }
     static calculatePressure(p, h) {
         let qnh = 0;
@@ -908,35 +903,12 @@ class Utility {
         }
         return null;
     }
-    static arraysAreEqual(arr1, arr2) {
-        if (arr1.length !== arr2.length) {
-            return false;
-        }
-        for(let i = 0; i < arr1.length; i++){
-            if (arr1[i] !== arr2[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-    static arraysContainSameElements(arr1, arr2) {
-        if (arr1.length !== arr2.length) {
-            return false;
-        }
-        const sortedArr1 = arr1.slice().sort();
-        const sortedArr2 = arr2.slice().sort();
-        return Utility.arraysAreEqual(sortedArr1, sortedArr2);
-    }
-    static difference(arr1, arr2) {
-        return arr1.filter((item)=>!arr2.includes(item));
-    }
 }
 
 class UpperWind {
     _rawdata = [];
     _flightLevels = [];
     _clickLocation = '';
-    _forecastDate = 0;
     _model = '';
     _forecastColumn = 0;
     _timestamp = Date.now();
@@ -948,18 +920,11 @@ class UpperWind {
     _lowerLevel = '0';
     _upperLevel = '3000';
     _errorhandler = false;
-    raw_data_old = [];
     setTime(t) {
         this._timestamp = t;
     }
     get getTime() {
         return this._timestamp;
-    }
-    get lowerLevel() {
-        return this._lowerLevel;
-    }
-    get upperLevel() {
-        return this._upperLevel;
     }
     get elevation() {
         return this._elevation;
@@ -972,13 +937,6 @@ class UpperWind {
     }
     get clickLocation() {
         return this._clickLocation;
-    }
-    get forecastDate() {
-        const date = new Date(this._forecastDate);
-        return date.toString();
-    }
-    get errorhandler() {
-        return this._errorhandler;
     }
     get model() {
         return this._model;
@@ -1007,7 +965,6 @@ class UpperWind {
             const weatherData = await this.fetchData(ev.lat, ev.lon, product);
             this._hours = weatherData.data.data.hours;
             this.findNearestColumn(this._hours);
-            this._forecastDate = this._hours[this._forecastColumn];
             this._model = weatherData.data.header.model;
             this.updateWeatherStats(weatherData.data);
             this._errorhandler = false;
