@@ -1,6 +1,6 @@
 const __pluginConfig =  {
   "name": "windy-plugin-upper-winds",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "icon": "🪂",
   "title": "Upper winds",
   "description": "Show upper winds, temperature and humidity at a given position",
@@ -12,9 +12,9 @@ const __pluginConfig =  {
   "desktopWidth": 500,
   "listenToSingleclick": true,
   "addToContextmenu": true,
-  "private": true,
-  "built": 1781103710362,
-  "builtReadable": "2026-06-10T15:01:50.362Z",
+  "private": false,
+  "built": 1781104331866,
+  "builtReadable": "2026-06-10T15:12:11.866Z",
   "screenshot": "screenshot.jpg"
 };
 
@@ -711,7 +711,7 @@ if (typeof window !== 'undefined')
 
 const config = {
     name: 'windy-plugin-upper-winds',
-    version: '0.0.24',
+    version: '0.0.25',
     icon: '🪂',
     title: 'Upper winds',
     description: 'Show upper winds, temperature and humidity at a given position',
@@ -723,7 +723,7 @@ const config = {
     desktopWidth: 500,
     listenToSingleclick: true,
     addToContextmenu: true,
-    private: true
+    private: false
 };
 
 class Utility {
