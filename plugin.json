@@ -1,0 +1,19 @@
+{
+  "name": "windy-plugin-upper-winds",
+  "version": "0.0.22",
+  "icon": "🪂",
+  "title": "Upper winds",
+  "description": "Show upper winds, temperature and humidity at a given position",
+  "author": "Wetterheidi",
+  "repository": "https://github.com/wetterheidi/windy-plugin-upper-winds.git",
+  "desktopUI": "rhpane",
+  "mobileUI": "fullscreen",
+  "routerPath": "/mff-winds",
+  "desktopWidth": 500,
+  "listenToSingleclick": true,
+  "addToContextmenu": true,
+  "private": true,
+  "built": 1781097775786,
+  "builtReadable": "2026-06-10T13:22:55.786Z",
+  "screenshot": "screenshot.jpg"
+}
