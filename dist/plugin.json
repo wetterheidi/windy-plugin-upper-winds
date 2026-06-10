@@ -1,6 +1,6 @@
 {
   "name": "windy-plugin-upper-winds",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "icon": "🪂",
   "title": "Upper winds",
   "description": "Show upper winds, temperature and humidity at a given position",
@@ -12,8 +12,8 @@
   "desktopWidth": 500,
   "listenToSingleclick": true,
   "addToContextmenu": true,
-  "private": false,
-  "built": 1781096456983,
-  "builtReadable": "2026-06-10T13:00:56.983Z",
+  "private": true,
+  "built": 1781097114988,
+  "builtReadable": "2026-06-10T13:11:54.988Z",
   "screenshot": "screenshot.jpg"
 }

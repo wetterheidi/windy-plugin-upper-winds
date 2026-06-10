@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.windy-plugins.com)",
+      "WebFetch(domain:community.windy.com)",
+      "Bash(git -C /Users/wetterheidi/Documents/Git/windy-plugin-upper-winds log --oneline -5)",
+      "Bash(curl -s https://docs.windy-plugins.com/getting-started/)",
+      "Bash(git -C /Users/wetterheidi/Documents/Git/windy-plugin-upper-winds show 608f9a2 --stat)"
+    ]
+  }
+}
