@@ -13,8 +13,8 @@ const __pluginConfig =  {
   "listenToSingleclick": true,
   "addToContextmenu": true,
   "private": true,
-  "built": 1781097626812,
-  "builtReadable": "2026-06-10T13:20:26.812Z",
+  "built": 1781097666249,
+  "builtReadable": "2026-06-10T13:21:06.249Z",
   "screenshot": "screenshot.jpg"
 };
 
